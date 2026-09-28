@@ -2,19 +2,195 @@ import streamlit as st
 
 # =========================================================
 # 2050 FUTURE ARCHITECT
+# Streamlit single-file version
 # =========================================================
 
 st.set_page_config(
     page_title="2050 FUTURE ARCHITECT",
     page_icon="🏙️",
     layout="wide",
-    initial_sidebar_state="expanded"
+    initial_sidebar_state="expanded",
 )
 
-# =========================================================
-# 세션 상태
-# =========================================================
+# ---------------------------------------------------------
+# Global CSS
+# ---------------------------------------------------------
+st.markdown("""
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;600;700;800&family=Noto+Sans+KR:wght@400;500;600;700&display=swap');
 
+html, body, [class*="css"] {
+    font-family: 'Noto Sans KR', sans-serif;
+}
+
+.stApp {
+    background:
+        radial-gradient(circle at 50% -10%, rgba(80, 130, 140, 0.18), transparent 35%),
+        linear-gradient(180deg, #071216 0%, #09171a 48%, #050b0d 100%);
+    color: #ffffff;
+}
+
+[data-testid="stHeader"] {
+    background: transparent;
+}
+
+.block-container {
+    max-width: 1450px;
+    padding-top: 1.8rem;
+    padding-bottom: 4rem;
+}
+
+h1, h2, h3 {
+    font-family: 'Orbitron', sans-serif !important;
+    letter-spacing: 1px;
+}
+
+.hero-title {
+    font-family: 'Orbitron', sans-serif;
+    font-size: clamp(42px, 5vw, 70px);
+    font-weight: 800;
+    line-height: 1.0;
+    letter-spacing: 2px;
+    color: #effff8;
+    text-shadow: 0 0 22px rgba(190, 255, 235, 0.22);
+    margin-bottom: 12px;
+}
+
+.hero-sub {
+    color: #d7e8e5;
+    letter-spacing: 1.5px;
+    font-size: 21px;
+    margin-bottom: 24px;
+}
+
+.section-title {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 28px;
+    font-weight: 700;
+    margin: 18px 0 12px;
+}
+
+.glass-card {
+    background: rgba(11, 26, 29, 0.78);
+    border: 1px solid rgba(145, 220, 207, 0.18);
+    border-radius: 20px;
+    padding: 24px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.28);
+}
+
+.info-card {
+    background: linear-gradient(135deg, rgba(21, 43, 45, .9), rgba(7, 20, 22, .88));
+    border: 1px solid rgba(126, 226, 204, .16);
+    border-radius: 18px;
+    padding: 20px;
+    height: 100%;
+}
+
+.info-label {
+    color: #7dd9ca;
+    font-size: 14px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 7px;
+}
+
+.info-value {
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.small-text {
+    color: #91a9aa;
+    font-size: 15px;
+    line-height: 1.7;
+}
+
+.source-box {
+    background: rgba(7, 18, 20, .88);
+    border: 1px solid rgba(120, 185, 180, .16);
+    border-radius: 16px;
+    padding: 18px;
+    color: #9eb5b5;
+    font-size: 15px;
+    line-height: 1.7;
+}
+
+button[kind="primary"] {
+    border-radius: 12px !important;
+    font-weight: 700 !important;
+}
+
+div[data-testid="stMetric"] {
+    background: rgba(12, 28, 30, .72);
+    border: 1px solid rgba(135, 210, 200, .14);
+    border-radius: 16px;
+    padding: 14px;
+}
+
+/* high-contrast typography */
+.stMarkdown, .stMarkdown p, .stMarkdown li, label, [data-testid="stWidgetLabel"], [data-testid="stWidgetLabel"] p {
+    color: #ffffff !important;
+    font-size: 16px !important;
+    line-height: 1.65 !important;
+}
+
+[data-baseweb="radio"] label, [data-baseweb="checkbox"] label,
+[data-baseweb="select"] *, [data-baseweb="input"] * {
+    color: #ffffff !important;
+}
+
+.stCaption, [data-testid="stCaptionContainer"] {
+    color: #c6d7d5 !important;
+    font-size: 14px !important;
+}
+
+button {
+    font-size: 16px !important;
+    min-height: 48px !important;
+}
+
+/* sidebar */
+section[data-testid="stSidebar"] {
+    background:
+        linear-gradient(180deg, #071113 0%, #0a181a 100%);
+    border-right: 1px solid rgba(135, 210, 200, .12);
+}
+
+.sidebar-title {
+    font-family: 'Orbitron', sans-serif;
+    color: #dffff6;
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    margin-bottom: 4px;
+}
+
+.sidebar-sub {
+    color: #718889;
+    font-size: 14px;
+    margin-bottom: 22px;
+}
+
+.nav-current {
+    background: rgba(120, 224, 204, .10);
+    border: 1px solid rgba(120, 224, 204, .24);
+    color: #bffbed;
+    border-radius: 10px;
+    padding: 10px 12px;
+    margin-bottom: 8px;
+}
+
+/* hide empty markdown gaps */
+div[data-testid="stMarkdownContainer"] p {
+    margin-bottom: .35rem;
+}
+</style>
+""", unsafe_allow_html=True)
+
+
+# ---------------------------------------------------------
+# Session state
+# ---------------------------------------------------------
 defaults = {
     "page": "HOME",
     "completed": False,
@@ -30,933 +206,1207 @@ for key, value in defaults.items():
         st.session_state[key] = value
 
 
-# =========================================================
-# CSS
-# =========================================================
-
-st.markdown("""
-<style>
-
-@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;800&family=Noto+Sans+KR:wght@400;500;700;900&display=swap');
-
-html, body, [class*="css"] {
-    font-family: 'Noto Sans KR', sans-serif;
+# ---------------------------------------------------------
+# Game data
+# ---------------------------------------------------------
+USAGES = {
+    "🏠 미래 주거시설": {
+        "pollution": 4,
+        "desc": "기후 변화에 대응하면서 사람들이 생활할 수 있는 미래형 주거공간",
+    },
+    "🏫 미래 학교": {
+        "pollution": 2,
+        "desc": "자연채광과 환기를 활용하는 미래 교육공간",
+    },
+    "🏥 미래 병원": {
+        "pollution": 5,
+        "desc": "에너지와 물 사용량을 줄이는 미래 의료시설",
+    },
+    "🔬 미래 연구센터": {
+        "pollution": 3,
+        "desc": "미래 기술과 환경 연구를 위한 고성능 연구공간",
+    },
 }
 
-.stApp {
-    background:
-        radial-gradient(circle at 15% 15%, rgba(90, 110, 120, 0.15), transparent 25%),
-        radial-gradient(circle at 80% 25%, rgba(20, 30, 35, 0.45), transparent 35%),
-        linear-gradient(135deg, #071014 0%, #10191d 45%, #182326 100%);
-    color: #edf4f2;
+SHAPES = {
+    "🏙️ 수직형 타워": {
+        "pollution": 7,
+        "height": 350,
+        "radius": "8px",
+        "desc": "좁은 부지에 많은 공간을 확보하는 고층형 건축",
+    },
+    "🌿 테라스형 건축": {
+        "pollution": 3,
+        "height": 260,
+        "radius": "28px 28px 8px 8px",
+        "desc": "층마다 외부공간을 두어 녹지와 건축물을 연결",
+    },
+    "🛸 돔형 건축": {
+        "pollution": 2,
+        "height": 245,
+        "radius": "50% 50% 12px 12px",
+        "desc": "곡면 지붕을 활용한 미래형 공간",
+    },
+    "🌍 반지하형 건축": {
+        "pollution": 1,
+        "height": 190,
+        "radius": "35px 35px 8px 8px",
+        "desc": "지형과 건축물을 결합해 외부 환경의 영향을 줄이는 형태",
+    },
 }
 
-/* 사이드바 */
-section[data-testid="stSidebar"] {
-    background:
-        linear-gradient(180deg, #081114 0%, #0c171a 55%, #101c1f 100%);
-    border-right: 1px solid rgba(150, 190, 180, 0.16);
-}
-
-section[data-testid="stSidebar"] * {
-    color: #e8f1ef !important;
-}
-
-/* 제목 */
-.main-title {
-    font-family: 'Orbitron', sans-serif;
-    font-size: 48px;
-    font-weight: 800;
-    letter-spacing: 3px;
-    color: #dfffee;
-    text-shadow: 0 0 22px rgba(100, 255, 190, 0.25);
-    margin-bottom: 5px;
-}
-
-.subtitle {
-    color: #9eafad;
-    font-size: 16px;
-    letter-spacing: 1px;
-    margin-bottom: 30px;
-}
-
-/* 카드 */
-.card {
-    background: rgba(20, 31, 35, 0.82);
-    border: 1px solid rgba(160, 210, 200, 0.14);
-    border-radius: 18px;
-    padding: 25px;
-    margin-bottom: 20px;
-    box-shadow: 0 15px 40px rgba(0,0,0,0.25);
-    backdrop-filter: blur(8px);
-}
-
-.card h2 {
-    margin-top: 0;
-    color: #dfffee;
-}
-
-.card p {
-    color: #aebdbb;
-    line-height: 1.7;
-}
-
-/* 미래 도시 배경 */
-.future-city {
-    position: relative;
-    height: 470px;
-    overflow: hidden;
-    border-radius: 25px;
-    border: 1px solid rgba(160, 210, 200, 0.16);
-
-    background:
-        radial-gradient(circle at 72% 25%, rgba(220,230,220,0.18), transparent 8%),
-        radial-gradient(circle at 72% 25%, rgba(90,100,100,0.18), transparent 19%),
-        linear-gradient(
-            180deg,
-            #172226 0%,
-            #263034 35%,
-            #171e20 65%,
-            #0a1012 100%
-        );
-
-    box-shadow:
-        inset 0 0 100px rgba(0,0,0,0.55),
-        0 20px 50px rgba(0,0,0,0.35);
-}
-
-/* 오염 안개 */
-.future-city:before {
-    content: "";
-    position: absolute;
-    left: -10%;
-    right: -10%;
-    bottom: 110px;
-    height: 170px;
-    background:
-        radial-gradient(ellipse, rgba(130,145,140,0.18), transparent 65%);
-    filter: blur(18px);
-}
-
-/* 지평선 */
-.horizon {
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 105px;
-    height: 2px;
-    background: rgba(180,200,190,0.08);
-}
-
-/* 도시 실루엣 */
-.city-building {
-    position: absolute;
-    bottom: 105px;
-    background: #0b1113;
-    border: 1px solid rgba(120,150,145,0.10);
-}
-
-.city1 { left: 3%; width: 10%; height: 145px; }
-.city2 { left: 15%; width: 7%; height: 210px; }
-.city3 { left: 25%; width: 13%; height: 125px; }
-.city4 { right: 20%; width: 12%; height: 190px; }
-.city5 { right: 5%; width: 10%; height: 145px; }
-
-/* 바닥 */
-.ground {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 108px;
-    background:
-        linear-gradient(180deg, #101819, #070b0c);
-    border-top: 1px solid rgba(160,190,180,0.08);
-}
-
-/* 건축물 */
-.building-scene {
-    position: absolute;
-    left: 50%;
-    bottom: 107px;
-    transform: translateX(-50%);
-    width: 270px;
-    min-height: 260px;
-    display: flex;
-    justify-content: center;
-    align-items: flex-end;
-}
-
-.building {
-    position: relative;
-    width: 170px;
-    min-height: 240px;
-    background: linear-gradient(90deg, #18282c, #263b3e, #142225);
-    border: 2px solid rgba(150,220,200,0.32);
-    border-radius: 5px 5px 2px 2px;
-    box-shadow:
-        0 0 35px rgba(80,255,190,0.13),
-        12px 15px 30px rgba(0,0,0,0.45);
-    padding: 12px;
-}
-
-/* 창문 */
-.windows {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 8px;
-    margin-top: 10px;
-}
-
-.window {
-    height: 20px;
-    border-radius: 2px;
-    background: #92d9cc;
-    box-shadow: 0 0 9px rgba(110,255,220,0.28);
-}
-
-/* 나무 */
-.tree {
-    position: absolute;
-    bottom: 0;
-    width: 25px;
-    height: 60px;
-}
-
-.tree:before {
-    content: "";
-    position: absolute;
-    left: 8px;
-    bottom: 0;
-    width: 8px;
-    height: 27px;
-    background: #493d31;
-}
-
-.tree:after {
-    content: "";
-    position: absolute;
-    left: -4px;
-    top: 0;
-    width: 34px;
-    height: 34px;
-    border-radius: 50%;
-    background: #47725d;
-    box-shadow: 0 0 14px rgba(90,180,130,0.16);
-}
-
-.tree1 { left: 25%; }
-.tree2 { right: 25%; }
-
-.complete-banner {
-    padding: 22px;
-    border-radius: 16px;
-    background: linear-gradient(
-        135deg,
-        rgba(50,150,110,0.18),
-        rgba(20,60,55,0.25)
-    );
-    border: 1px solid rgba(100,230,180,0.25);
-}
-
-.danger-banner {
-    padding: 22px;
-    border-radius: 16px;
-    background: rgba(130,70,50,0.15);
-    border: 1px solid rgba(220,130,100,0.25);
-}
-
-.source-box {
-    padding: 18px;
-    margin-top: 30px;
-    border-radius: 15px;
-    background: rgba(10,18,20,0.75);
-    border: 1px solid rgba(150,180,175,0.12);
-    color: #98aaa7;
-    font-size: 13px;
-    line-height: 1.8;
-}
-
-.metric-box {
-    text-align: center;
-    padding: 22px 10px;
-    border-radius: 16px;
-    background: rgba(20,35,38,0.85);
-    border: 1px solid rgba(150,210,195,0.12);
-}
-
-.metric-number {
-    font-family: 'Orbitron', sans-serif;
-    font-size: 36px;
-    font-weight: 800;
-    color: #dfffee;
-}
-
-.metric-label {
-    color: #92a7a4;
-    font-size: 13px;
-}
-
-</style>
-""", unsafe_allow_html=True)
-
-
-# =========================================================
-# 데이터
-# =========================================================
-
-USAGE_DATA = {
-    "🏠 미래 주거시설": {"pollution": 4, "height": 250},
-    "🏫 미래 학교": {"pollution": 2, "height": 220},
-    "🏥 미래 병원": {"pollution": 5, "height": 270},
-    "🏢 미래 연구센터": {"pollution": 3, "height": 290},
-}
-
-SHAPE_DATA = {
-    "🏙️ 수직형 타워": {"pollution": 7, "height": 340},
-    "🏡 테라스형": {"pollution": 3, "height": 270},
-    "🫧 돔형": {"pollution": 2, "height": 230},
-    "⬇️ 지하·반지하형": {"pollution": 1, "height": 210},
-}
-
-MATERIAL_DATA = {
+MATERIALS = {
     "🧱 저탄소 콘크리트": {
         "pollution": 8,
-        "description": "기존 콘크리트보다 탄소 영향을 줄이는 방향의 재료를 가정"
+        "desc": "일반 콘크리트보다 탄소 배출을 줄이는 방향의 건축 재료",
     },
     "🔩 저탄소 철강": {
         "pollution": 7,
-        "description": "철강 생산 과정의 탄소 영향을 줄이는 방향을 가정"
+        "desc": "철강 생산 과정에서의 탄소 배출 저감을 고려한 재료",
     },
     "🌲 목재·바이오 기반 재료": {
         "pollution": 3,
-        "description": "재생 가능한 바이오 기반 재료를 사용하는 선택"
+        "desc": "목재 등 바이오 기반 재료를 건축에 활용하는 방식",
     },
     "♻️ 재사용·재활용 재료": {
         "pollution": 2,
-        "description": "기존 자원을 다시 활용하는 순환형 건축 재료"
+        "desc": "기존 자원을 다시 사용해 새로운 재료 생산을 줄이는 방식",
     },
 }
 
-TECH_DATA = {
+TECHNOLOGIES = {
     "☀️ 태양광 발전": -9,
-    "🌬️ 자연 환기": -7,
+    "🌬️ 자연환기": -7,
     "🪟 외부 차양": -6,
-    "🌿 녹색 지붕": -7,
-    "💧 빗물 활용": -5,
-    "♻️ 물 재이용": -5,
+    "🌱 녹화 지붕": -7,
+    "💧 빗물 이용": -5,
+    "🔄 물 재이용": -5,
 }
 
-DECOR_DATA = {
+DECORATIONS = {
     "🌳 수직 정원": -5,
     "🌿 녹색 벽": -4,
-    "🌱 건물 주변 녹지": -4,
-    "🪴 옥상 정원": -5,
+    "🌲 주변 녹지": -4,
+    "🌱 옥상 정원": -5,
 }
 
-# =========================================================
-# 오염지수 계산
-# =========================================================
 
+# ---------------------------------------------------------
+# Pollution score
+# This is a fictional game score, NOT real carbon emissions.
+# Lower = better.
+# ---------------------------------------------------------
 def calculate_pollution():
-
-    # 90을 출발점으로 하는 게임용 지표
     score = 90
+    score += USAGES[st.session_state.usage]["pollution"]
+    score += SHAPES[st.session_state.shape]["pollution"]
+    score += MATERIALS[st.session_state.material]["pollution"]
 
-    score += USAGE_DATA[st.session_state.usage]["pollution"]
-    score += SHAPE_DATA[st.session_state.shape]["pollution"]
-    score += MATERIAL_DATA[st.session_state.material]["pollution"]
+    for item in st.session_state.technologies:
+        score += TECHNOLOGIES[item]
 
-    for tech in st.session_state.technologies:
-        score += TECH_DATA[tech]
-
-    for decor in st.session_state.decorations:
-        score += DECOR_DATA[decor]
+    for item in st.session_state.decorations:
+        score += DECORATIONS[item]
 
     return max(0, min(100, score))
 
 
-# =========================================================
-# 건축물 HTML
-# =========================================================
+# ---------------------------------------------------------
+# 3D polluted future city
+# Pure HTML/CSS 3D. No external 3D library needed.
+# ---------------------------------------------------------
+def polluted_world_html():
+    return """
+<div class="world-3d">
+    <div class="stars"></div>
 
+    <div class="sun-3d">
+        <div class="sun-core"></div>
+        <div class="sun-ring"></div>
+    </div>
+
+    <div class="smog smog-a"></div>
+    <div class="smog smog-b"></div>
+    <div class="smog smog-c"></div>
+
+    <div class="mountain mountain-back"></div>
+    <div class="mountain mountain-mid"></div>
+
+    <div class="city-3d">
+        <div class="tower t1"><i></i><i></i><i></i><i></i></div>
+        <div class="tower t2"><i></i><i></i><i></i><i></i><i></i></div>
+        <div class="tower t3"><i></i><i></i><i></i></div>
+        <div class="tower t4"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+        <div class="tower t5"><i></i><i></i><i></i><i></i></div>
+        <div class="tower t6"><i></i><i></i><i></i></div>
+    </div>
+
+    <div class="ground-3d"></div>
+
+    <div class="road road-1"></div>
+    <div class="road road-2"></div>
+    <div class="road-grid"></div>
+    <div class="holo-ring ring-1"></div>
+    <div class="holo-ring ring-2"></div>
+
+    <div class="warning-panel">
+        <span>EARTH STATUS</span>
+        <strong>CRITICAL</strong>
+        <small>ATMOSPHERE / 2050</small>
+    </div>
+
+    <div class="world-caption">
+        <b>EARTH // 2050</b>
+        <span>THE AIR IS NO LONGER FREE.</span>
+    </div>
+</div>
+
+<style>
+.world-3d {
+    position: relative;
+    height: 520px;
+    overflow: hidden;
+    border-radius: 26px;
+    border: 1px solid rgba(174, 234, 220, .18);
+    background:
+        radial-gradient(circle at 50% 42%, rgba(90, 140, 125, .22), transparent 18%),
+        linear-gradient(180deg, #102a2d 0%, #243f3c 45%, #1b2928 68%, #090e0e 100%);
+    perspective: 900px;
+    box-shadow: inset 0 0 120px rgba(0,0,0,.58), 0 30px 70px rgba(0,0,0,.35);
+}
+
+.world-3d::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+        radial-gradient(ellipse at center, transparent 28%, rgba(0,0,0,.28) 75%, rgba(0,0,0,.72) 100%),
+        repeating-linear-gradient(115deg, rgba(255,255,255,.018) 0 1px, transparent 1px 7px);
+    pointer-events: none;
+}
+
+.stars {
+    position: absolute;
+    inset: 0;
+    opacity: .55;
+    background-image:
+        radial-gradient(circle at 12% 22%, #d5eee5 0 1px, transparent 2px),
+        radial-gradient(circle at 29% 13%, #d5eee5 0 1px, transparent 2px),
+        radial-gradient(circle at 70% 18%, #d5eee5 0 1px, transparent 2px),
+        radial-gradient(circle at 88% 30%, #d5eee5 0 1px, transparent 2px),
+        radial-gradient(circle at 55% 9%, #d5eee5 0 1px, transparent 2px);
+}
+
+.sun-3d {
+    position: absolute;
+    top: 62px;
+    right: 14%;
+    width: 145px;
+    height: 145px;
+    transform: translateZ(-60px);
+}
+
+.sun-core {
+    position: absolute;
+    inset: 28px;
+    border-radius: 50%;
+    background: radial-gradient(circle, #d9ffbd 0%, #a3c77c 45%, #68764d 100%);
+    box-shadow: 0 0 55px rgba(177, 224, 130, .28);
+}
+
+.sun-ring {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    border: 1px solid rgba(191, 222, 156, .24);
+    box-shadow: 0 0 35px rgba(155, 198, 130, .12);
+}
+
+.smog {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(25px);
+    opacity: .42;
+}
+
+.smog-a {
+    width: 520px;
+    height: 150px;
+    left: -80px;
+    top: 155px;
+    background: rgba(74, 102, 83, .62);
+    transform: rotate(-5deg);
+}
+
+.smog-b {
+    width: 610px;
+    height: 180px;
+    right: -120px;
+    top: 205px;
+    background: rgba(91, 83, 63, .54);
+    transform: rotate(8deg);
+}
+
+.smog-c {
+    width: 760px;
+    height: 130px;
+    left: 18%;
+    top: 280px;
+    background: rgba(68, 81, 76, .52);
+    transform: rotate(-3deg);
+}
+
+.mountain {
+    position: absolute;
+    left: 0;
+    width: 100%;
+    clip-path: polygon(0 100%, 0 67%, 13% 45%, 25% 68%, 38% 40%, 52% 71%, 66% 46%, 79% 67%, 91% 42%, 100% 65%, 100% 100%);
+}
+
+.mountain-back {
+    bottom: 135px;
+    height: 260px;
+    background: #253b39;
+    opacity: .75;
+    transform: translateZ(-180px) scale(1.2);
+}
+
+.mountain-mid {
+    bottom: 100px;
+    height: 210px;
+    background: #172725;
+    opacity: .92;
+    transform: translateZ(-80px) scale(1.1);
+}
+
+.city-3d {
+    position: absolute;
+    left: 4%;
+    right: 4%;
+    bottom: 110px;
+    height: 270px;
+    display: flex;
+    align-items: end;
+    justify-content: space-around;
+    transform: rotateX(8deg) translateZ(10px);
+    transform-style: preserve-3d;
+}
+
+.tower {
+    position: relative;
+    width: 11%;
+    min-width: 52px;
+    background: linear-gradient(90deg, #101d1d, #2b4542 45%, #101919);
+    border: 1px solid rgba(143, 192, 183, .15);
+    box-shadow: -12px 0 30px rgba(0,0,0,.25), 12px 0 30px rgba(0,0,0,.15);
+    transform: skewY(0deg) rotateY(-5deg);
+}
+
+.tower::before {
+    content: "";
+    position: absolute;
+    left: 100%;
+    top: 8px;
+    width: 24px;
+    height: 100%;
+    background: linear-gradient(90deg, #142221, #0a1111);
+    transform: skewY(-38deg);
+    transform-origin: left top;
+    opacity: .9;
+}
+
+.tower::after {
+    content: "";
+    position: absolute;
+    left: 5px;
+    right: 5px;
+    top: -12px;
+    height: 13px;
+    background: #344f4a;
+    transform: skewX(-45deg);
+    opacity: .85;
+}
+
+.t1 { height: 145px; }
+.t2 { height: 210px; }
+.t3 { height: 125px; }
+.t4 { height: 245px; }
+.t5 { height: 175px; }
+.t6 { height: 135px; }
+
+.tower i {
+    display: block;
+    height: 4px;
+    margin: 18px 7px;
+    background: rgba(151, 205, 187, .34);
+    box-shadow: 0 0 8px rgba(130, 205, 182, .08);
+}
+
+.ground-3d {
+    position: absolute;
+    left: -10%;
+    bottom: -220px;
+    width: 120%;
+    height: 330px;
+    background:
+        linear-gradient(180deg, rgba(28,42,40,.2), rgba(4,8,8,.98)),
+        repeating-linear-gradient(90deg, rgba(120,145,137,.08) 0 2px, transparent 2px 80px);
+    transform: rotateX(64deg) translateZ(-20px);
+    transform-origin: top center;
+}
+
+.road {
+    position: absolute;
+    bottom: 78px;
+    width: 75%;
+    height: 7px;
+    background: rgba(123, 147, 141, .16);
+    box-shadow: 0 0 18px rgba(130, 190, 175, .06);
+    transform: skewX(-42deg);
+}
+
+.road-1 { left: -8%; }
+.road-2 { right: -12%; bottom: 55px; }
+
+.road-grid {
+    position: absolute;
+    left: -12%;
+    bottom: 0;
+    width: 124%;
+    height: 210px;
+    transform: perspective(500px) rotateX(66deg);
+    transform-origin: bottom center;
+    background:
+        linear-gradient(rgba(110, 176, 161, .08) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(110, 176, 161, .08) 1px, transparent 1px);
+    background-size: 46px 30px;
+    opacity: .7;
+}
+
+.holo-ring {
+    position: absolute;
+    border: 1px solid rgba(120, 220, 197, .16);
+    border-radius: 50%;
+    transform-style: preserve-3d;
+    filter: blur(.2px);
+}
+
+.ring-1 {
+    width: 520px;
+    height: 170px;
+    left: calc(50% - 260px);
+    bottom: 88px;
+    transform: rotateX(67deg);
+}
+
+.ring-2 {
+    width: 350px;
+    height: 110px;
+    left: calc(50% - 175px);
+    bottom: 115px;
+    transform: rotateX(67deg);
+}
+
+.warning-panel {
+    position: absolute;
+    top: 28px;
+    left: 28px;
+    width: 155px;
+    padding: 13px 15px;
+    border-left: 3px solid #d8a56b;
+    background: rgba(8, 18, 19, .63);
+    backdrop-filter: blur(8px);
+    color: #9fb7b3;
+    letter-spacing: 1px;
+}
+
+.warning-panel span,
+.warning-panel small {
+    display: block;
+    font-size: 9px;
+}
+
+.warning-panel strong {
+    display: block;
+    margin: 4px 0;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 22px;
+    color: #d9b57f;
+}
+
+.world-caption {
+    position: absolute;
+    right: 28px;
+    bottom: 28px;
+    text-align: right;
+    z-index: 4;
+}
+
+.world-caption b {
+    display: block;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 18px;
+    color: #dcece6;
+}
+
+.world-caption span {
+    display: block;
+    margin-top: 4px;
+    color: #718785;
+    font-size: 10px;
+    letter-spacing: 2px;
+}
+</style>
+"""
+
+
+# ---------------------------------------------------------
+# Building result preview
+# ---------------------------------------------------------
 def building_html():
-
-    usage = st.session_state.usage
     shape = st.session_state.shape
+    height = SHAPES[shape]["height"]
+    radius = SHAPES[shape]["radius"]
 
-    if "돔형" in shape:
-        border_radius = "85px 85px 8px 8px"
-    elif "테라스" in shape:
-        border_radius = "5px 5px 25px 25px"
-    elif "지하" in shape:
-        border_radius = "35px 35px 3px 3px"
-    else:
-        border_radius = "5px"
+    material = st.session_state.material
 
-    height = SHAPE_DATA[shape]["height"]
+    material_css = {
+        "🧱 저탄소 콘크리트": """
+            background: linear-gradient(105deg, #536765, #253b3a 46%, #172625);
+            border-color: rgba(177, 214, 205, .30);
+        """,
+        "🔩 저탄소 철강": """
+            background: linear-gradient(105deg, #687b7c, #263a3c 48%, #111b1c);
+            border-color: rgba(184, 218, 225, .34);
+        """,
+        "🌲 목재·바이오 기반 재료": """
+            background: linear-gradient(105deg, #68705c, #344138 50%, #1c2824);
+            border-color: rgba(184, 211, 163, .28);
+        """,
+        "♻️ 재사용·재활용 재료": """
+            background: linear-gradient(105deg, #516d69, #244543 50%, #142b2a);
+            border-color: rgba(116, 226, 196, .35);
+        """,
+    }[material]
 
     windows = ""
-    for _ in range(9):
-        windows += '<div class="window"></div>'
+    for i in range(12):
+        windows += f'<span class="window w{i}"></span>'
 
-    trees = ""
-    if st.session_state.decorations:
-        trees = """
-        <div class="tree tree1"></div>
-        <div class="tree tree2"></div>
+    solar = ""
+    if "☀️ 태양광 발전" in st.session_state.technologies:
+        solar = """
+        <div class="solar-panel solar-1"></div>
+        <div class="solar-panel solar-2"></div>
         """
 
+    green_roof = ""
+    if "🌱 녹화 지붕" in st.session_state.technologies:
+        green_roof = '<div class="green-roof"></div>'
+
+    trees = ""
+    if "🌳 수직 정원" in st.session_state.decorations or "🌲 주변 녹지" in st.session_state.decorations:
+        trees += '<div class="tree tree-1"></div><div class="tree tree-2"></div><div class="tree tree-3"></div>'
+
+    green_wall = ""
+    if "🌿 녹색 벽" in st.session_state.decorations:
+        green_wall = '<div class="green-wall"></div>'
+
     return f"""
-    <div class="future-city">
+<div class="building-world">
+    <div class="building-stars"></div>
+    <div class="building-haze"></div>
 
-        <div class="city-building city1"></div>
-        <div class="city-building city2"></div>
-        <div class="city-building city3"></div>
-        <div class="city-building city4"></div>
-        <div class="city-building city5"></div>
+    <div class="future-moon"></div>
 
-        <div class="horizon"></div>
+    <div class="far-city">
+        <span></span><span></span><span></span><span></span><span></span>
+        <span></span><span></span><span></span>
+    </div>
 
-        <div class="building-scene">
-            <div class="building"
-                 style="height:{height}px;
-                        border-radius:{border_radius};">
+    <div class="building-ground"></div>
 
-                <div style="
-                    font-size:11px;
-                    color:#b8d8d0;
-                    text-align:center;
-                    letter-spacing:1px;
-                    margin-bottom:8px;">
-                    2050 FUTURE ARCHITECT
-                </div>
+    <div class="building-wrap">
+        <div class="building-shadow"></div>
+        {green_roof}
 
-                <div class="windows">
-                    {windows}
-                </div>
-
-            </div>
+        <div class="main-building"
+             style="height:{height}px; border-radius:{radius}; {material_css}">
+            <div class="building-top"></div>
+            <div class="building-side"></div>
+            {windows}
+            {green_wall}
+            {solar}
         </div>
 
         {trees}
-
-        <div class="ground"></div>
-
-        <div style="
-            position:absolute;
-            left:25px;
-            top:25px;
-            color:#d8e4e1;
-            font-family:'Orbitron';
-            font-size:13px;
-            letter-spacing:2px;">
-            YEAR 2050
-        </div>
-
-        <div style="
-            position:absolute;
-            right:25px;
-            top:25px;
-            color:#8faaa5;
-            font-size:12px;">
-            AIR QUALITY : CRITICAL
-        </div>
-
     </div>
-    """
+
+    <div class="building-label">
+        <span>2050 FUTURE ARCHITECT</span>
+        <b>{st.session_state.usage}</b>
+        <small>{st.session_state.shape} · {st.session_state.material}</small>
+    </div>
+</div>
+
+<style>
+.building-world {
+    position: relative;
+    height: 520px;
+    overflow: hidden;
+    border-radius: 24px;
+    border: 1px solid rgba(155, 220, 208, .18);
+    background:
+        radial-gradient(circle at 70% 24%, rgba(120, 171, 153, .16), transparent 18%),
+        linear-gradient(180deg, #0a1b1e 0%, #122a2c 45%, #0b1617 100%);
+    perspective: 900px;
+}
+
+.building-world::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at center, transparent 30%, rgba(0,0,0,.55) 100%);
+    pointer-events: none;
+}
+
+.building-stars {
+    position: absolute;
+    inset: 0;
+    opacity: .45;
+    background-image:
+        radial-gradient(circle at 10% 18%, #cde8df 0 1px, transparent 2px),
+        radial-gradient(circle at 24% 31%, #cde8df 0 1px, transparent 2px),
+        radial-gradient(circle at 48% 13%, #cde8df 0 1px, transparent 2px),
+        radial-gradient(circle at 78% 19%, #cde8df 0 1px, transparent 2px),
+        radial-gradient(circle at 91% 34%, #cde8df 0 1px, transparent 2px);
+}
+
+.building-haze {
+    position: absolute;
+    width: 700px;
+    height: 170px;
+    left: 25%;
+    top: 180px;
+    border-radius: 50%;
+    background: rgba(83, 118, 108, .18);
+    filter: blur(30px);
+}
+
+.future-moon {
+    position: absolute;
+    top: 65px;
+    right: 12%;
+    width: 88px;
+    height: 88px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, #d7eee4, #7eaaa1 58%, #344c49);
+    box-shadow: 0 0 50px rgba(180, 232, 214, .14);
+}
+
+.far-city {
+    position: absolute;
+    left: 4%;
+    right: 4%;
+    bottom: 110px;
+    height: 145px;
+    display: flex;
+    align-items: end;
+    justify-content: space-around;
+    opacity: .48;
+    transform: translateZ(-80px) scale(1.12);
+}
+
+.far-city span {
+    display: block;
+    width: 8%;
+    background: linear-gradient(90deg, #0c1718, #203432, #0b1314);
+    border: 1px solid rgba(150, 190, 180, .12);
+}
+
+.far-city span:nth-child(1) { height: 75px; }
+.far-city span:nth-child(2) { height: 105px; }
+.far-city span:nth-child(3) { height: 58px; }
+.far-city span:nth-child(4) { height: 130px; }
+.far-city span:nth-child(5) { height: 88px; }
+.far-city span:nth-child(6) { height: 112px; }
+.far-city span:nth-child(7) { height: 70px; }
+.far-city span:nth-child(8) { height: 96px; }
+
+.building-ground {
+    position: absolute;
+    left: -10%;
+    bottom: -180px;
+    width: 120%;
+    height: 300px;
+    background:
+        linear-gradient(180deg, rgba(29,48,45,.15), #050b0c 72%),
+        repeating-linear-gradient(90deg, rgba(140,180,168,.08) 0 2px, transparent 2px 75px);
+    transform: rotateX(63deg);
+    transform-origin: top center;
+}
+
+.building-wrap {
+    position: absolute;
+    left: 50%;
+    bottom: 65px;
+    width: 430px;
+    height: 430px;
+    transform: translateX(-50%) rotateY(-10deg);
+    transform-style: preserve-3d;
+    z-index: 3;
+}
+
+.main-building {
+    position: absolute;
+    bottom: 0;
+    left: 105px;
+    width: 220px;
+    border: 1px solid;
+    box-shadow:
+        0 0 30px rgba(110, 230, 202, .10),
+        -24px 30px 45px rgba(0,0,0,.35);
+    overflow: hidden;
+    transform: perspective(700px) rotateY(-5deg);
+}
+
+.building-top {
+    position: absolute;
+    top: -12px;
+    left: 5px;
+    right: -18px;
+    height: 15px;
+    background: rgba(115, 156, 148, .75);
+    transform: skewX(-45deg);
+}
+
+.building-side {
+    position: absolute;
+    top: 5px;
+    left: 100%;
+    width: 34px;
+    height: 100%;
+    background: linear-gradient(90deg, #172927, #081011);
+    transform: skewY(-38deg);
+    transform-origin: left top;
+}
+
+.window {
+    position: absolute;
+    width: 24px;
+    height: 13px;
+    background: linear-gradient(180deg, #d6fff2, #6bb4a4);
+    border: 1px solid rgba(230,255,249,.45);
+    box-shadow: 0 0 12px rgba(142, 244, 211, .20);
+}
+
+.w0 { left: 24px; top: 28px; }
+.w1 { left: 72px; top: 28px; }
+.w2 { left: 120px; top: 28px; }
+.w3 { left: 168px; top: 28px; }
+.w4 { left: 24px; top: 82px; }
+.w5 { left: 72px; top: 82px; }
+.w6 { left: 120px; top: 82px; }
+.w7 { left: 168px; top: 82px; }
+.w8 { left: 24px; top: 136px; }
+.w9 { left: 72px; top: 136px; }
+.w10 { left: 120px; top: 136px; }
+.w11 { left: 168px; top: 136px; }
+
+.green-roof {
+    position: absolute;
+    left: 96px;
+    bottom: 402px;
+    width: 230px;
+    height: 28px;
+    border-radius: 50%;
+    background: linear-gradient(180deg, #5d9d78, #274d3a);
+    box-shadow: 0 0 20px rgba(90, 183, 122, .22);
+    z-index: 4;
+}
+
+.green-wall {
+    position: absolute;
+    left: 4px;
+    top: 0;
+    width: 9px;
+    height: 100%;
+    background: repeating-linear-gradient(
+        180deg,
+        #73ad78 0 9px,
+        #2e6547 9px 17px
+    );
+    opacity: .82;
+}
+
+.solar-panel {
+    position: absolute;
+    width: 46px;
+    height: 30px;
+    border: 1px solid rgba(154, 222, 216, .48);
+    background:
+        repeating-linear-gradient(90deg, rgba(180,240,232,.20) 0 1px, transparent 1px 11px),
+        repeating-linear-gradient(0deg, rgba(180,240,232,.20) 0 1px, transparent 1px 10px),
+        linear-gradient(135deg, #183b42, #071b20);
+    transform: skewX(-12deg) rotate(-12deg);
+    z-index: 5;
+}
+
+.solar-1 {
+    top: -6px;
+    right: 24px;
+}
+
+.solar-2 {
+    top: 18px;
+    right: 42px;
+}
+
+.building-shadow {
+    position: absolute;
+    left: 55px;
+    bottom: -10px;
+    width: 320px;
+    height: 55px;
+    border-radius: 50%;
+    background: rgba(0,0,0,.62);
+    filter: blur(14px);
+}
+
+.tree {
+    position: absolute;
+    bottom: 4px;
+    width: 30px;
+    height: 68px;
+    background: linear-gradient(90deg, #183d31, #5d956f);
+    clip-path: polygon(50% 0, 86% 34%, 68% 34%, 94% 66%, 66% 66%, 84% 100%, 16% 100%, 34% 66%, 6% 66%, 32% 34%, 14% 34%);
+    filter: drop-shadow(0 0 10px rgba(76, 164, 116, .16));
+}
+
+.tree-1 { left: 45px; }
+.tree-2 { right: 44px; height: 85px; }
+.tree-3 { right: 8px; height: 52px; }
+
+.building-label {
+    position: absolute;
+    left: 28px;
+    bottom: 25px;
+    z-index: 6;
+}
+
+.building-label span {
+    display: block;
+    color: #72cdbd;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 10px;
+    letter-spacing: 2px;
+}
+
+.building-label b {
+    display: block;
+    margin-top: 4px;
+    font-size: 17px;
+    color: #e4f5ef;
+}
+
+.building-label small {
+    color: #738b88;
+    font-size: 11px;
+}
+</style>
+"""
 
 
-# =========================================================
-# 사이드바
-# =========================================================
-
+# ---------------------------------------------------------
+# Sidebar
+# ---------------------------------------------------------
 with st.sidebar:
-
-    st.markdown("## 🏙️ 2050 ARCHITECT")
-
-    st.caption("오염된 미래의 지구에서 새로운 건축물을 설계하세요.")
-
-    st.divider()
+    st.markdown('<div class="sidebar-title">2050 // ARCHITECT</div>', unsafe_allow_html=True)
+    st.markdown('<div class="sidebar-sub">FUTURE CITY DESIGN SIMULATION</div>', unsafe_allow_html=True)
 
     pages = {
-        "🌍 메인": "HOME",
-        "🏠 건축물 용도": "USAGE",
-        "🏗️ 건축 형태": "SHAPE",
-        "🧱 건축 자재": "MATERIAL",
-        "⚡ 미래 기술": "TECH",
-        "🎨 건축물 꾸미기": "DECOR",
-        "🏆 완성 결과": "RESULT",
+        "🏠 HOME": "HOME",
+        "① 건축물 용도": "USAGE",
+        "② 건축 형태": "SHAPE",
+        "③ 건축 자재": "MATERIAL",
+        "④ 미래 기술": "TECH",
+        "⑤ 꾸미기": "DECOR",
+        "📋 설계 결과": "RESULT",
     }
 
     for label, page_name in pages.items():
-
         if st.button(
             label,
             key=f"nav_{page_name}",
-            use_container_width=True
+            use_container_width=True,
+            type="primary" if st.session_state.page == page_name else "secondary",
         ):
             st.session_state.page = page_name
             st.rerun()
 
     st.divider()
 
-    pollution = calculate_pollution()
-
-    st.markdown("### 현재 오염지수")
-
-    st.progress(pollution / 100)
-
+    score = calculate_pollution()
+    st.markdown("### 🌫️ 오염지수")
+    st.progress(score / 100)
     st.markdown(
-        f"""
-        <div style="text-align:center;
-                    font-family:'Orbitron';
-                    font-size:27px;
-                    margin:8px;">
-            {pollution}
-        </div>
-        """,
-        unsafe_allow_html=True
+        f'<div style="font-family:Orbitron;font-size:25px;color:#dff9f2;">{score}<span style="font-size:12px;color:#78908e;"> / 100</span></div>',
+        unsafe_allow_html=True,
     )
+    st.caption("낮을수록 친환경적인 설계")
 
-    st.caption("낮을수록 미래 환경에 적합한 설계")
+    if score <= 40:
+        st.success("MISSION READY")
+    else:
+        st.warning("환경 부담이 아직 높습니다.")
 
 
-# =========================================================
+# ---------------------------------------------------------
 # HOME
-# =========================================================
-
+# ---------------------------------------------------------
 if st.session_state.page == "HOME":
+    st.markdown('<div class="hero-title">2050 FUTURE ARCHITECT</div>', unsafe_allow_html=True)
+    st.markdown('<div class="hero-sub">BUILD A FUTURE THAT CAN SURVIVE.</div>', unsafe_allow_html=True)
 
-    st.markdown(
-        '<div class="main-title">2050 FUTURE ARCHITECT</div>',
-        unsafe_allow_html=True
-    )
+    # IMPORTANT:
+    # This uses st.html instead of st.markdown so the HTML is rendered,
+    # not shown as literal <div> text.
+    if st.session_state.completed:
+        st.markdown("## 🏙️ YOUR 2050 BUILDING")
+        st.html(building_html())
 
-    st.markdown(
-        '<div class="subtitle">BUILD A FUTURE THAT CAN SURVIVE.</div>',
-        unsafe_allow_html=True
-    )
+        score = calculate_pollution()
 
-    st.markdown(building_html(), unsafe_allow_html=True)
+        if score <= 40:
+            st.success(f"🌍 설계 성공! 최종 오염지수 {score} — 2050 도시 생존 조건을 통과했습니다.")
+        else:
+            st.error(f"⚠️ 설계 실패! 최종 오염지수 {score} — 환경 부담을 더 낮춰야 합니다.")
 
-    st.markdown("")
+        c1, c2 = st.columns(2)
+        with c1:
+            if st.button("📋 설계 결과 자세히 보기", use_container_width=True):
+                st.session_state.page = "RESULT"
+                st.rerun()
+        with c2:
+            if st.button("🔄 새로운 건축물 만들기", use_container_width=True):
+                st.session_state.completed = False
+                st.session_state.technologies = []
+                st.session_state.decorations = []
+                st.session_state.page = "USAGE"
+                st.rerun()
 
-    col1, col2 = st.columns([2, 1])
+    else:
+        st.html(polluted_world_html())
 
-    with col1:
-
+        st.markdown("")
         st.markdown("""
-        <div class="card">
+<div class="glass-card">
+    <div class="info-label">MISSION 2050</div>
+    <h2 style="margin:4px 0 10px;">오염된 지구에 새로운 건축물을 설계하라.</h2>
+    <div class="small-text">
+        2050년, 지구의 대기와 도시 환경은 지금보다 더 큰 압박을 받고 있습니다.
+        당신은 미래의 건축가가 되어 건축물의 용도, 형태, 자재, 미래 기술과 주변 환경을 직접 선택합니다.
+        선택한 요소에 따라 게임 속 오염지수가 달라집니다.
+    </div>
+</div>
+""", unsafe_allow_html=True)
 
-        <h2>🌍 2050년, 지구는 변했습니다.</h2>
+        st.markdown("")
+        c1, c2, c3 = st.columns(3)
 
-        <p>
-        대기오염과 기후 변화가 심해진 가상의 2050년.
-        기존의 건축 방식만으로는 새로운 환경에 대응하기 어렵습니다.
-        </p>
+        with c1:
+            st.markdown("""
+<div class="info-card">
+    <div class="info-label">01 / DESIGN</div>
+    <div class="info-value">건축물 설계</div>
+    <div class="small-text">용도부터 형태와 자재까지 직접 선택합니다.</div>
+</div>
+""", unsafe_allow_html=True)
 
-        <p>
-        당신은 이 도시의 미래 건축가입니다.
-        건축물의 용도와 형태, 재료, 미래 기술을 선택하고
-        새로운 시대에 맞는 건축물을 완성해야 합니다.
-        </p>
+        with c2:
+            st.markdown("""
+<div class="info-card">
+    <div class="info-label">02 / TECHNOLOGY</div>
+    <div class="info-value">미래 기술 적용</div>
+    <div class="small-text">태양광, 자연환기, 녹화 등 미래 요소를 추가합니다.</div>
+</div>
+""", unsafe_allow_html=True)
 
-        <p>
-        <b>목표는 하나.</b><br>
-        오염지수를 낮추어 미래 도시에서 살아남을 수 있는 건축물을 만드는 것.
-        </p>
+        with c3:
+            st.markdown("""
+<div class="info-card">
+    <div class="info-label">03 / SURVIVAL</div>
+    <div class="info-value">도시의 미래 결정</div>
+    <div class="small-text">최종 오염지수가 40 이하이면 미션 성공입니다.</div>
+</div>
+""", unsafe_allow_html=True)
 
-        </div>
-        """, unsafe_allow_html=True)
-
-        if st.button(
-            "🚀 미래 건축 설계 시작",
-            type="primary",
-            use_container_width=True
-        ):
+        st.markdown("")
+        if st.button("🚀 미래 건축 설계 시작", type="primary", use_container_width=True):
             st.session_state.page = "USAGE"
             st.rerun()
 
-    with col2:
-
         st.markdown("""
-        <div class="card">
-
-        <h3>MISSION</h3>
-
-        <p>① 건축물 용도 선택</p>
-        <p>② 건축 형태 선택</p>
-        <p>③ 건축 자재 선택</p>
-        <p>④ 미래 기술 선택</p>
-        <p>⑤ 건축물 꾸미기</p>
-        <p>⑥ 최종 오염지수 확인</p>
-
-        <hr>
-
-        <p>
-        <b>🏆 SUCCESS</b><br>
-        오염지수 40 이하
-        </p>
-
-        </div>
-        """, unsafe_allow_html=True)
+<div class="source-box" style="margin-top:20px;">
+<b>RESEARCH NOTE</b><br>
+이 게임의 건축·환경 요소는 건축물의 에너지 사용, 건축 재료의 탄소 영향,
+녹화·차양·자연환기·물 관리 등의 실제 환경 대응 개념을 참고해 구성했습니다.
+단, 게임 속 오염지수는 이해를 위한 가상의 지표이며 실제 탄소배출량을 의미하지 않습니다.
+</div>
+""", unsafe_allow_html=True)
 
 
-# =========================================================
+# ---------------------------------------------------------
 # USAGE
-# =========================================================
-
+# ---------------------------------------------------------
 elif st.session_state.page == "USAGE":
+    st.markdown('<div class="hero-title" style="font-size:40px;">01 / BUILDING USE</div>', unsafe_allow_html=True)
+    st.markdown('<div class="hero-sub">WHAT WILL YOUR BUILDING DO?</div>', unsafe_allow_html=True)
 
-    st.markdown("## 🏠 01. 건축물 용도")
-
-    st.markdown("""
-    <div class="card">
-    <h2>어떤 건축물을 만들까요?</h2>
-    <p>
-    2050년의 환경에서 사람들이 어떤 목적으로 사용할 건축물인지 선택하세요.
-    </p>
-    </div>
-    """, unsafe_allow_html=True)
-
-    selected = st.radio(
-        "건축물 용도를 선택하세요.",
-        list(USAGE_DATA.keys()),
-        index=list(USAGE_DATA.keys()).index(st.session_state.usage)
+    choice = st.radio(
+        "건축물의 용도를 선택하세요.",
+        list(USAGES.keys()),
+        index=list(USAGES.keys()).index(st.session_state.usage),
     )
+    st.session_state.usage = choice
 
-    st.session_state.usage = selected
+    st.markdown(f"""
+<div class="glass-card">
+    <div class="info-label">SELECTED USE</div>
+    <h2>{choice}</h2>
+    <div class="small-text">{USAGES[choice]["desc"]}</div>
+</div>
+""", unsafe_allow_html=True)
 
-    st.info(
-        "건축물의 용도에 따라 필요한 공간과 에너지 사용 특성이 달라질 수 있습니다."
-    )
-
-    if st.button("다음 → 건축 형태", type="primary"):
+    if st.button("다음 → 건축 형태", type="primary", use_container_width=True):
         st.session_state.page = "SHAPE"
         st.rerun()
 
 
-# =========================================================
+# ---------------------------------------------------------
 # SHAPE
-# =========================================================
-
+# ---------------------------------------------------------
 elif st.session_state.page == "SHAPE":
+    st.markdown('<div class="hero-title" style="font-size:40px;">02 / FORM</div>', unsafe_allow_html=True)
+    st.markdown('<div class="hero-sub">SHAPE THE FUTURE CITY.</div>', unsafe_allow_html=True)
 
-    st.markdown("## 🏗️ 02. 건축 형태")
-
-    st.markdown("""
-    <div class="card">
-    <h2>미래 건축물의 형태를 결정하세요.</h2>
-    <p>
-    같은 기능의 건축물이라도 형태와 공간 구성에 따라
-    환경에 대응하는 방식이 달라질 수 있습니다.
-    </p>
-    </div>
-    """, unsafe_allow_html=True)
-
-    selected = st.radio(
-        "건축 형태",
-        list(SHAPE_DATA.keys()),
-        index=list(SHAPE_DATA.keys()).index(st.session_state.shape)
+    choice = st.radio(
+        "건축 형태를 선택하세요.",
+        list(SHAPES.keys()),
+        index=list(SHAPES.keys()).index(st.session_state.shape),
     )
+    st.session_state.shape = choice
 
-    st.session_state.shape = selected
+    st.html(building_html())
 
-    st.markdown(building_html(), unsafe_allow_html=True)
+    st.markdown(f"""
+<div class="glass-card">
+    <div class="info-label">FORM DESCRIPTION</div>
+    <h3>{choice}</h3>
+    <div class="small-text">{SHAPES[choice]["desc"]}</div>
+</div>
+""", unsafe_allow_html=True)
 
-    if st.button("다음 → 건축 자재", type="primary"):
+    if st.button("다음 → 건축 자재", type="primary", use_container_width=True):
         st.session_state.page = "MATERIAL"
         st.rerun()
 
 
-# =========================================================
+# ---------------------------------------------------------
 # MATERIAL
-# =========================================================
-
+# ---------------------------------------------------------
 elif st.session_state.page == "MATERIAL":
+    st.markdown('<div class="hero-title" style="font-size:40px;">03 / MATERIAL</div>', unsafe_allow_html=True)
+    st.markdown('<div class="hero-sub">WHAT WILL YOUR BUILDING BE MADE OF?</div>', unsafe_allow_html=True)
 
-    st.markdown("## 🧱 03. 건축 자재")
+    choice = st.radio(
+        "건축 자재를 선택하세요.",
+        list(MATERIALS.keys()),
+        index=list(MATERIALS.keys()).index(st.session_state.material),
+    )
+    st.session_state.material = choice
+
+    st.markdown(f"""
+<div class="glass-card">
+    <div class="info-label">MATERIAL</div>
+    <h2>{choice}</h2>
+    <div class="small-text">{MATERIALS[choice]["desc"]}</div>
+</div>
+""", unsafe_allow_html=True)
 
     st.markdown("""
-    <div class="card">
-    <h2>건축물의 재료를 선택하세요.</h2>
-    <p>
-    건축 재료의 생산과 사용 과정에서도 환경에 영향을 줄 수 있습니다.
-    어떤 재료를 선택할지 결정하세요.
-    </p>
-    </div>
-    """, unsafe_allow_html=True)
+<div class="source-box" style="margin-top:18px;">
+<b>REFERENCE</b><br>
+UNEP의 건축 자재 관련 자료에서는 시멘트·철강·알루미늄 등의 재료가
+건축물의 내재탄소와 연결될 수 있으며, 재사용·재활용과 저탄소 재료 등의 접근이
+건축 부문의 탄소 저감과 관련된 방법으로 다뤄집니다.
+</div>
+""", unsafe_allow_html=True)
 
-    selected = st.radio(
-        "주요 건축 자재",
-        list(MATERIAL_DATA.keys()),
-        index=list(MATERIAL_DATA.keys()).index(st.session_state.material)
-    )
-
-    st.session_state.material = selected
-
-    st.success(
-        MATERIAL_DATA[selected]["description"]
-    )
-
-    st.markdown("""
-    <div class="source-box">
-    📚 자료 근거<br>
-    UNEP, <i>Building Materials and the Climate: Constructing a New Future</i>
-    는 건축 재료의 생산과 사용 과정에서 발생하는 환경 영향을 고려하고,
-    재사용·순환형 재료와 저탄소 재료로 전환하는 방향을 제시합니다.
-    </div>
-    """, unsafe_allow_html=True)
-
-    if st.button("다음 → 미래 기술", type="primary"):
+    if st.button("다음 → 미래 기술", type="primary", use_container_width=True):
         st.session_state.page = "TECH"
         st.rerun()
 
 
-# =========================================================
+# ---------------------------------------------------------
 # TECH
-# =========================================================
-
+# ---------------------------------------------------------
 elif st.session_state.page == "TECH":
-
-    st.markdown("## ⚡ 04. 미래 기술 및 요소")
-
-    st.markdown("""
-    <div class="card">
-    <h2>2050년의 건축 기술을 선택하세요.</h2>
-    <p>
-    여러 기술을 동시에 선택할 수 있습니다.
-    어떤 기술을 적용할지는 당신의 설계 전략에 달려 있습니다.
-    </p>
-    </div>
-    """, unsafe_allow_html=True)
+    st.markdown('<div class="hero-title" style="font-size:40px;">04 / FUTURE TECH</div>', unsafe_allow_html=True)
+    st.markdown('<div class="hero-sub">UPGRADE YOUR BUILDING.</div>', unsafe_allow_html=True)
 
     selected = st.multiselect(
-        "적용할 미래 기술을 선택하세요.",
-        list(TECH_DATA.keys()),
-        default=st.session_state.technologies
+        "건축물에 적용할 미래 기술을 선택하세요.",
+        list(TECHNOLOGIES.keys()),
+        default=st.session_state.technologies,
     )
-
     st.session_state.technologies = selected
 
-    if selected:
-        st.write("현재 선택한 기술")
+    st.markdown("")
+    cols = st.columns(3)
 
-        for item in selected:
-            st.write(f"• {item}")
+    descriptions = {
+        "☀️ 태양광 발전": "건물에서 전기를 생산하는 재생에너지 요소",
+        "🌬️ 자연환기": "기계 장치에만 의존하지 않고 자연적인 공기 흐름을 활용",
+        "🪟 외부 차양": "강한 햇빛을 조절해 냉방 부담을 줄이는 요소",
+        "🌱 녹화 지붕": "옥상에 식생을 적용하는 방식",
+        "💧 빗물 이용": "빗물을 모아 건물의 물 사용에 활용",
+        "🔄 물 재이용": "사용한 물을 처리해 다시 활용하는 방식",
+    }
+
+    for i, item in enumerate(TECHNOLOGIES):
+        with cols[i % 3]:
+            checked = "SELECTED" if item in selected else "AVAILABLE"
+            st.markdown(f"""
+<div class="info-card" style="margin-bottom:14px;">
+    <div class="info-label">{checked}</div>
+    <div class="info-value">{item}</div>
+    <div class="small-text">{descriptions[item]}</div>
+</div>
+""", unsafe_allow_html=True)
 
     st.markdown("""
-    <div class="source-box">
-    📚 자료 근거<br>
-    IPCC는 기후 적응형 건축과 관련해 외부 차양, 자연환기,
-    단열, 태양 방향을 고려한 설계, 녹색 지붕·벽,
-    물 관리 등의 방법을 설명합니다.
-    </div>
-    """, unsafe_allow_html=True)
+<div class="source-box">
+<b>REFERENCE</b><br>
+IPCC의 기후변화 대응 관련 자료에서는 녹화, 도시 식생, 차양,
+자연환기, 단열, 물 관리 등 다양한 건축·도시 대응 방법을 다룹니다.
+</div>
+""", unsafe_allow_html=True)
 
-    if st.button("다음 → 건축물 꾸미기", type="primary"):
+    if st.button("다음 → 꾸미기", type="primary", use_container_width=True):
         st.session_state.page = "DECOR"
         st.rerun()
 
 
-# =========================================================
+# ---------------------------------------------------------
 # DECOR
-# =========================================================
-
+# ---------------------------------------------------------
 elif st.session_state.page == "DECOR":
-
-    st.markdown("## 🎨 05. 건축물 꾸미기")
-
-    st.markdown("""
-    <div class="card">
-    <h2>마지막으로 건축물의 자연 요소를 추가하세요.</h2>
-    <p>
-    건물의 외관을 꾸미면서 동시에 녹지와 자연 요소를 설계에 넣을 수 있습니다.
-    </p>
-    </div>
-    """, unsafe_allow_html=True)
+    st.markdown('<div class="hero-title" style="font-size:40px;">05 / DECORATE</div>', unsafe_allow_html=True)
+    st.markdown('<div class="hero-sub">MAKE THE BUILDING PART OF NATURE.</div>', unsafe_allow_html=True)
 
     selected = st.multiselect(
-        "추가할 요소를 선택하세요.",
-        list(DECOR_DATA.keys()),
-        default=st.session_state.decorations
+        "건축물 주변과 외관을 꾸며보세요.",
+        list(DECORATIONS.keys()),
+        default=st.session_state.decorations,
     )
-
     st.session_state.decorations = selected
 
-    st.markdown(building_html(), unsafe_allow_html=True)
+    st.html(building_html())
 
     st.markdown("")
-
-    if st.button(
-        "🏗️ 건축물 완성하기",
-        type="primary",
-        use_container_width=True
-    ):
+    if st.button("🏗️ 건축물 완성하기", type="primary", use_container_width=True):
         st.session_state.completed = True
-        st.session_state.page = "RESULT"
+        # 핵심 수정:
+        # 완성 버튼을 누르면 결과를 RESULT 페이지에만 보여주는 것이 아니라
+        # 바로 HOME으로 돌아가 완성된 건축물이 보이게 함.
+        st.session_state.page = "HOME"
         st.rerun()
 
 
-# =========================================================
+# ---------------------------------------------------------
 # RESULT
-# =========================================================
-
+# ---------------------------------------------------------
 elif st.session_state.page == "RESULT":
+    st.markdown('<div class="hero-title" style="font-size:40px;">DESIGN REPORT</div>', unsafe_allow_html=True)
+    st.markdown('<div class="hero-sub">YOUR 2050 ARCHITECTURE PROFILE</div>', unsafe_allow_html=True)
 
-    pollution = calculate_pollution()
+    score = calculate_pollution()
 
-    st.markdown("## 🏆 06. 2050 건축물 완성")
-
-    st.markdown(building_html(), unsafe_allow_html=True)
+    st.html(building_html())
 
     st.markdown("")
-
-    # 성공 여부
-    if pollution <= 40:
-
-        st.markdown("""
-        <div class="complete-banner">
-
-        <h1>🏆 MISSION SUCCESS</h1>
-
-        <p>
-        당신의 건축물은 2050년의 오염된 환경에서
-        살아남을 수 있는 설계 조건을 달성했습니다.
-        </p>
-
-        </div>
-        """, unsafe_allow_html=True)
-
+    if score <= 40:
+        st.success(f"🌍 MISSION SUCCESS — 오염지수 {score}")
     else:
+        st.error(f"⚠️ MISSION FAILED — 오염지수 {score}")
 
-        st.markdown("""
-        <div class="danger-banner">
+    a, b, c = st.columns(3)
+    with a:
+        st.metric("오염지수", score, "낮을수록 좋음")
+    with b:
+        st.metric("미래 기술", len(st.session_state.technologies))
+    with c:
+        st.metric("환경 요소", len(st.session_state.decorations))
 
-        <h1>⚠️ MISSION FAILED</h1>
+    st.markdown("## 🧾 설계 선택")
 
-        <p>
-        현재 설계의 오염지수가 목표 기준을 넘었습니다.
-        다른 재료나 미래 기술을 선택해 설계를 다시 시도해보세요.
-        </p>
+    st.markdown(f"""
+<div class="glass-card">
+    <div class="info-label">BUILDING USE</div>
+    <h3>{st.session_state.usage}</h3>
+    <div class="small-text">{USAGES[st.session_state.usage]["desc"]}</div>
+    <hr style="border-color:rgba(255,255,255,.08);">
+    <div class="info-label">FORM</div>
+    <h3>{st.session_state.shape}</h3>
+    <div class="small-text">{SHAPES[st.session_state.shape]["desc"]}</div>
+    <hr style="border-color:rgba(255,255,255,.08);">
+    <div class="info-label">MATERIAL</div>
+    <h3>{st.session_state.material}</h3>
+    <div class="small-text">{MATERIALS[st.session_state.material]["desc"]}</div>
+</div>
+""", unsafe_allow_html=True)
 
-        </div>
-        """, unsafe_allow_html=True)
-
-    st.markdown("")
-
-    c1, c2, c3 = st.columns(3)
-
-    with c1:
-        st.markdown(
-            f"""
-            <div class="metric-box">
-            <div class="metric-number">{pollution}</div>
-            <div class="metric-label">오염지수</div>
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
-
-    with c2:
-        st.markdown(
-            f"""
-            <div class="metric-box">
-            <div class="metric-number">{len(st.session_state.technologies)}</div>
-            <div class="metric-label">미래 기술</div>
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
-
-    with c3:
-        st.markdown(
-            f"""
-            <div class="metric-box">
-            <div class="metric-number">{len(st.session_state.decorations)}</div>
-            <div class="metric-label">자연 요소</div>
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
-
-    st.markdown("### 📋 나의 설계")
-
-    st.write(f"**건축물 용도:** {st.session_state.usage}")
-    st.write(f"**건축 형태:** {st.session_state.shape}")
-    st.write(f"**건축 자재:** {st.session_state.material}")
-
+    st.markdown("### ⚡ 적용한 미래 기술")
     if st.session_state.technologies:
-        st.write(
-            "**미래 기술:** "
-            + ", ".join(st.session_state.technologies)
-        )
+        for item in st.session_state.technologies:
+            st.write("•", item)
     else:
-        st.write("**미래 기술:** 선택하지 않음")
+        st.caption("선택한 미래 기술이 없습니다.")
 
+    st.markdown("### 🌿 적용한 꾸미기 요소")
     if st.session_state.decorations:
-        st.write(
-            "**꾸미기 요소:** "
-            + ", ".join(st.session_state.decorations)
-        )
+        for item in st.session_state.decorations:
+            st.write("•", item)
     else:
-        st.write("**꾸미기 요소:** 선택하지 않음")
+        st.caption("선택한 환경 요소가 없습니다.")
 
     st.markdown("""
-    <div class="source-box">
-
-    ### 📚 프로그램에 사용한 자료
-
-    <b>UNEP · Global Alliance for Buildings and Construction</b><br>
-    건물·건설 부문의 에너지 사용과 CO₂ 배출,
-    건축 재료의 탄소 영향 및 저탄소·순환형 건축 방향을 참고했습니다.
-
-    <br><br>
-
-    <b>UNEP · Building Materials and the Climate</b><br>
-    건축 재료의 전 생애 과정과 저탄소 재료,
-    재사용·순환형 건축 재료에 대한 내용을 참고했습니다.
-
-    <br><br>
-
-    <b>IPCC · AR6 WGII Chapter 6</b><br>
-    녹색 지붕·벽, 도시 녹지, 차양, 자연환기,
-    단열, 물 관리 등 기후 적응형 건축 요소를 참고했습니다.
-
-    <br><br>
-
-    <b>중요:</b> 오염지수는 위 자료를 바탕으로 프로그램의 선택 요소에
-    차이를 주기 위해 만든 <b>게임용 가상 지표</b>이며,
-    실제 건물의 탄소배출량이나 환경성능을 계산한 값은 아닙니다.
-
-    </div>
-    """, unsafe_allow_html=True)
+<div class="source-box" style="margin-top:20px;">
+<b>SOURCES</b><br>
+• UNEP Global Status Report for Buildings and Construction<br>
+• UNEP Building Materials and the Climate<br>
+• IPCC AR6 WGII Chapter 6<br><br>
+※ 본 프로그램의 오염지수는 실제 건물의 탄소배출량을 계산하는 값이 아니라
+건축 요소의 환경 영향을 게임 방식으로 표현한 가상의 지표입니다.
+</div>
+""", unsafe_allow_html=True)
 
     st.markdown("")
+    c1, c2 = st.columns(2)
 
-    col1, col2 = st.columns(2)
-
-    with col1:
-        if st.button(
-            "🌍 메인으로 돌아가기",
-            use_container_width=True
-        ):
+    with c1:
+        if st.button("🏠 메인 화면으로", use_container_width=True):
             st.session_state.page = "HOME"
             st.rerun()
 
-    with col2:
-        if st.button(
-            "🔄 새로운 건축물 만들기",
-            use_container_width=True
-        ):
-
+    with c2:
+        if st.button("🔄 새로운 설계 시작", use_container_width=True):
             st.session_state.completed = False
             st.session_state.usage = "🏠 미래 주거시설"
             st.session_state.shape = "🏙️ 수직형 타워"
             st.session_state.material = "🧱 저탄소 콘크리트"
             st.session_state.technologies = []
             st.session_state.decorations = []
-
             st.session_state.page = "USAGE"
             st.rerun()
