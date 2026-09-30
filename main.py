@@ -37,6 +37,17 @@ h1,h2,h3 { color:#fff !important; }
 
 section[data-testid="stSidebar"] { background:#071012; border-right:1px solid rgba(160,220,208,.14); }
 section[data-testid="stSidebar"] * { color:#f4fffc; }
+section[data-testid="stSidebar"] button { background:#101a1c !important; color:#ffffff !important; border:1px solid rgba(180,225,215,.20) !important; }
+section[data-testid="stSidebar"] button:hover { background:#18282a !important; border-color:rgba(180,225,215,.42) !important; }
+section[data-testid="stSidebar"] button[kind="primary"] { background:#ff4b50 !important; color:#ffffff !important; border-color:#ff4b50 !important; }
+section[data-testid="stSidebar"] button[kind="primary"]:hover { background:#ff6267 !important; }
+section[data-testid="stSidebar"] button p, section[data-testid="stSidebar"] button span, section[data-testid="stSidebar"] button div { color:#ffffff !important; }
+.expert-box { background:linear-gradient(145deg,#101e20,#0a1315); border:1px solid rgba(160,220,208,.20); border-radius:18px; padding:20px 22px; margin:16px 0; }
+.expert-box .expert-kicker { color:#76d9c5; font-size:12px; font-weight:800; letter-spacing:1.5px; margin-bottom:7px; }
+.expert-box h3 { margin:0 0 8px; color:#ffffff !important; font-size:20px; }
+.expert-box p { margin:6px 0; color:#d8e6e3; line-height:1.85; font-size:14px; }
+.expert-box b { color:#ffffff; }
+
 [data-baseweb="select"] > div { min-height:52px; font-size:16px !important; font-weight:700 !important; }
 button { font-size:16px !important; font-weight:800 !important; }
 button[kind="primary"] { min-height:54px !important; border-radius:13px !important; }
@@ -255,8 +266,9 @@ def building_html():
     </div>
 
     <div class="building-stage">
-        <div id="building3d" class="building-3d __SHAPE__ __USAGE__ __MATERIAL__" style="--building-color:__COLOR__">
+        <div id="building3d" class="building-3d __SHAPE__ __USAGE__ __MATERIAL__ __TECH__" style="--building-color:__COLOR__">
             <div class="face front">
+                <div class="surface-tech"></div>
                 <div class="top-cap"></div>
                 <div class="badge">__BADGE__</div>
                 <div class="window-grid">
@@ -267,11 +279,11 @@ def building_html():
                 <div class="vertical-core"></div>
                 __FEATURES__
             </div>
-            <div class="face right"><div class="side-lines"></div><div class="side-window sw1"></div><div class="side-window sw2"></div><div class="side-window sw3"></div></div>
-            <div class="face left"><div class="side-lines"></div></div>
-            <div class="face back"><div class="back-panel"></div></div>
-            <div class="face top"><div class="roof-grid"></div></div>
-            <div class="face bottom"></div>
+            <div class="face right"><div class="surface-tech"></div><div class="side-lines"></div><div class="side-window sw1"></div><div class="side-window sw2"></div><div class="side-window sw3"></div></div>
+            <div class="face left"><div class="surface-tech"></div><div class="side-lines"></div><div class="side-window sw1"></div><div class="side-window sw2"></div></div>
+            <div class="face back"><div class="surface-tech"></div><div class="back-panel"></div></div>
+            <div class="face top"><div class="surface-tech"></div><div class="roof-grid"></div></div>
+            <div class="face bottom"><div class="surface-tech"></div></div>
         </div>
     </div>
 
@@ -297,10 +309,11 @@ def building_html():
 .building-3d{--w:210px;--h:310px;--d:150px;--building-color:#5D7F7A;position:absolute;left:50%;bottom:18px;width:var(--w);height:var(--h);transform-style:preserve-3d;transform-origin:center center;transform:translateX(-50%) rotateX(-4deg) rotateY(0deg)}
 .building-3d.tower{--w:180px;--h:350px;--d:130px}.building-3d.terrace{--w:240px;--h:285px;--d:165px}.building-3d.dome{--w:280px;--h:250px;--d:190px}.building-3d.eco{--w:300px;--h:215px;--d:210px}
 .face{position:absolute;box-sizing:border-box;border:1px solid rgba(235,255,247,.27);overflow:hidden;backface-visibility:hidden}.front,.back{width:var(--w);height:var(--h)}.front{transform:translateZ(calc(var(--d)/2));background:linear-gradient(90deg,rgba(255,255,255,.09),transparent 18%,transparent 82%,rgba(0,0,0,.18)),var(--building-color)}.back{transform:rotateY(180deg) translateZ(calc(var(--d)/2));background:#263735}.right,.left{width:var(--d);height:var(--h);left:calc((var(--w) - var(--d))/2)}.right{transform:rotateY(90deg) translateZ(calc(var(--w)/2));background:linear-gradient(90deg,#172827,#4a625d)}.left{transform:rotateY(-90deg) translateZ(calc(var(--w)/2));background:linear-gradient(90deg,#4a625d,#162424)}.top,.bottom{width:var(--w);height:var(--d);top:calc((var(--h) - var(--d))/2)}.top{transform:rotateX(90deg) translateZ(calc(var(--h)/2));background:linear-gradient(135deg,#899a91,#354945)}.bottom{transform:rotateX(-90deg) translateZ(calc(var(--h)/2));background:#0c1617}
-.concrete .front{background:repeating-linear-gradient(0deg,rgba(255,255,255,.025) 0 3px,transparent 3px 14px),linear-gradient(90deg,rgba(255,255,255,.09),transparent 20%,rgba(0,0,0,.16)),var(--building-color)}
-.steel .front{background:linear-gradient(105deg,rgba(255,255,255,.26),transparent 22%,rgba(255,255,255,.08) 52%,rgba(0,0,0,.18)),var(--building-color)}
-.wood .front{background:repeating-linear-gradient(90deg,rgba(72,39,22,.15) 0 3px,transparent 3px 15px),var(--building-color)}
-.recycled .front{background:repeating-linear-gradient(45deg,rgba(255,255,255,.10) 0 8px,transparent 8px 18px),var(--building-color)}
+.concrete .face{background:repeating-linear-gradient(0deg,rgba(255,255,255,.025) 0 3px,transparent 3px 14px),linear-gradient(90deg,rgba(255,255,255,.08),transparent 20%,rgba(0,0,0,.16)),var(--building-color)}
+.steel .face{background:linear-gradient(105deg,rgba(255,255,255,.26),transparent 22%,rgba(255,255,255,.08) 52%,rgba(0,0,0,.18)),var(--building-color)}
+.wood .face{background:repeating-linear-gradient(90deg,rgba(72,39,22,.15) 0 3px,transparent 3px 15px),linear-gradient(90deg,rgba(255,255,255,.07),transparent 30%,rgba(0,0,0,.12)),var(--building-color)}
+.recycled .face{background:repeating-linear-gradient(45deg,rgba(255,255,255,.10) 0 8px,transparent 8px 18px),linear-gradient(135deg,rgba(255,255,255,.08),transparent 45%,rgba(0,0,0,.14)),var(--building-color)}
+.concrete .top,.concrete .bottom,.steel .top,.steel .bottom,.wood .top,.wood .bottom,.recycled .top,.recycled .bottom{background-image:inherit}
 .terrace .front{clip-path:polygon(0 0,100% 0,100% 100%,0 100%,0 74%,8% 74%,8% 57%,0 57%,0 40%,8% 40%,8% 23%,0 23%)}
 .dome .front{border-radius:48% 48% 8px 8px;background:radial-gradient(ellipse at 50% 3%,rgba(240,255,249,.28),transparent 35%),var(--building-color)}
 .eco .front{border-radius:18px 18px 5px 5px;background:linear-gradient(180deg,rgba(116,170,116,.30),transparent 30%),var(--building-color)}
@@ -312,14 +325,33 @@ def building_html():
 .school .front:after{content:'CAMPUS';position:absolute;left:13px;bottom:12px;color:rgba(235,255,249,.65);font:700 8px 'Orbitron',sans-serif;letter-spacing:1px}.hospital .front:after{content:'+';position:absolute;left:50%;bottom:12px;transform:translateX(-50%);font:800 24px Arial;color:#d9ffff}.research .front:after{content:'R-2050';position:absolute;left:12px;bottom:12px;color:rgba(222,255,249,.7);font:700 8px 'Orbitron',sans-serif}
 .vertical-core{position:absolute;left:48%;top:0;bottom:0;width:4px;background:rgba(218,255,246,.10)}
 .side-lines{position:absolute;inset:0;background:repeating-linear-gradient(90deg,transparent 0 24px,rgba(220,245,237,.10) 24px 27px)}
-.side-window{position:absolute;left:18px;width:48px;height:17px;background:#8fc6b6;box-shadow:0 0 9px rgba(145,230,206,.14)}.sw1{top:42px}.sw2{top:120px}.sw3{top:198px}
+.side-window{position:absolute;z-index:6;left:18px;width:48px;height:17px;background:#8fc6b6;box-shadow:0 0 9px rgba(145,230,206,.14)}.sw1{top:42px}.sw2{top:120px}.sw3{top:198px}
 .back-panel{position:absolute;inset:18px;border:1px solid rgba(220,245,237,.13);background:repeating-linear-gradient(0deg,rgba(255,255,255,.04) 0 3px,transparent 3px 17px)}
 .roof-grid{position:absolute;inset:12px;border:1px solid rgba(255,255,255,.15);background:repeating-linear-gradient(90deg,transparent 0 20px,rgba(255,255,255,.08) 20px 21px),repeating-linear-gradient(0deg,transparent 0 20px,rgba(255,255,255,.08) 20px 21px)}
+.surface-tech{position:absolute;inset:0;z-index:2;pointer-events:none;opacity:0}
+/* 선택한 미래 기술의 흔적을 모든 면에 적용 */
+.future-viewer .surface-tech{opacity:.18}
+.solar .surface-tech{opacity:.48;background:repeating-linear-gradient(90deg,transparent 0 23px,rgba(130,232,218,.22) 23px 25px),repeating-linear-gradient(0deg,transparent 0 23px,rgba(130,232,218,.18) 23px 25px);mix-blend-mode:screen}
+.vent .surface-tech{opacity:.42;background:radial-gradient(circle at 25% 35%,rgba(154,224,211,.42) 0 2px,transparent 3px),radial-gradient(circle at 72% 66%,rgba(154,224,211,.35) 0 2px,transparent 3px);background-size:44px 44px,52px 52px}
+.shade .surface-tech{opacity:.72;background:repeating-linear-gradient(0deg,transparent 0 55px,rgba(220,231,223,.34) 55px 62px);}
+.greenroof .surface-tech{opacity:.36;background:radial-gradient(circle at 20% 20%,rgba(117,184,104,.45) 0 10px,transparent 11px),radial-gradient(circle at 75% 70%,rgba(117,184,104,.40) 0 13px,transparent 14px);background-size:70px 65px,85px 75px}
+.rain .surface-tech{opacity:.44;background:repeating-linear-gradient(90deg,transparent 0 28px,rgba(104,202,226,.30) 28px 30px)}
+.reuse .surface-tech{opacity:.40;background:repeating-linear-gradient(45deg,transparent 0 18px,rgba(129,225,203,.25) 18px 22px)}
 .solar-panel{position:absolute;z-index:10;width:58px;height:37px;border:1px solid #8de2d1;background:repeating-linear-gradient(90deg,rgba(170,255,242,.24) 0 1px,transparent 1px 13px),repeating-linear-gradient(0deg,rgba(170,255,242,.24) 0 1px,transparent 1px 12px),#163944;transform:skewX(-15deg) rotate(-12deg)}.sp1{right:14px;top:9px}.sp2{left:13px;top:18px}
 .air-ring{position:absolute;z-index:10;width:42px;height:42px;border:2px solid #99ddd0;border-radius:50%;color:#dffef7;font:700 8px 'Orbitron',sans-serif;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.18)}.ar1{left:11px;top:43%}.ar2{right:11px;top:54%}
 .shade{position:absolute;z-index:10;left:8%;width:84%;height:8px;background:#bdc8c2;border-radius:3px;box-shadow:0 3px 0 rgba(0,0,0,.2)}.sh1{top:32%}.sh2{top:51%}.sh3{top:70%}
 .green-roof{position:absolute;z-index:11;top:-7px;left:7%;width:86%;height:21px;border-radius:50%;background:linear-gradient(#7aa96f,#315c3d);box-shadow:0 0 18px rgba(105,189,121,.22);color:#eaffdf;text-align:center;font:700 7px 'Orbitron',sans-serif;padding-top:5px}
 .water-tank{position:absolute;z-index:11;right:9px;bottom:12px;width:47px;height:47px;border-radius:50%;border:2px solid #78c9dc;background:rgba(27,105,126,.55);color:#dffaff;font:700 6px 'Orbitron',sans-serif;text-align:center;padding-top:14px}.reuse-mark{position:absolute;z-index:11;left:12px;bottom:15px;width:42px;height:42px;border:3px dashed #82e0ca;border-radius:50%;color:#dffff7;font-size:25px;text-align:center;line-height:36px}
+.building-3d:after{content:"";position:absolute;left:50%;bottom:-18px;width:calc(var(--w) + 38px);height:24px;transform:translateX(-50%) rotateX(70deg);background:radial-gradient(ellipse,rgba(0,0,0,.62),transparent 70%);filter:blur(5px);pointer-events:none}
+.building-3d .top-cap{position:absolute;z-index:8;left:8%;right:8%;top:10px;height:13px;border:1px solid rgba(230,255,247,.25);border-radius:5px;background:linear-gradient(90deg,rgba(255,255,255,.20),rgba(255,255,255,.04),rgba(0,0,0,.20))}
+.building-3d .badge{position:absolute;z-index:9;right:10px;bottom:10px;padding:5px 7px;border:1px solid rgba(220,255,247,.35);background:rgba(4,15,16,.48);color:#eafff9;font:800 8px 'Orbitron',sans-serif;letter-spacing:1px}
+.building-3d .window-grid{position:absolute;z-index:5;inset:55px 13px 24px;display:grid;grid-template-columns:repeat(4,1fr);gap:9px 7px;opacity:.92}
+.building-3d .window-grid span{border:1px solid rgba(225,255,249,.25);background:linear-gradient(135deg,rgba(180,242,228,.82),rgba(35,73,75,.65));box-shadow:inset 0 0 8px rgba(230,255,250,.12),0 0 8px rgba(122,225,203,.08)}
+.terrace .window-grid{inset:52px 28px 20px;grid-template-columns:repeat(3,1fr)}
+.dome .window-grid{inset:58px 30px 24px;grid-template-columns:repeat(3,1fr);gap:7px}
+.eco .window-grid{inset:54px 34px 22px;grid-template-columns:repeat(4,1fr);gap:6px}
+.tech-tag{position:absolute;z-index:14;left:12px;top:13px;padding:4px 6px;border-radius:5px;background:rgba(4,16,17,.68);border:1px solid rgba(161,236,221,.38);color:#eafff8;font:800 7px 'Orbitron',sans-serif;letter-spacing:1px}
+.tech-tag.vent-tag{border-color:rgba(173,232,220,.38)}
 .viewer-caption{position:absolute;left:24px;bottom:22px;z-index:30;padding:12px 15px;background:rgba(5,12,13,.74);border-left:3px solid #d8b47e;backdrop-filter:blur(7px)}.viewer-caption b{display:block;color:#fff;font:800 13px 'Orbitron',sans-serif;letter-spacing:1px}.viewer-caption span{display:block;color:#d4e1de;margin-top:5px;font-size:12px}
 .drag-guide{position:absolute;z-index:30;top:18px;left:50%;transform:translateX(-50%);padding:9px 15px;border-radius:999px;background:rgba(5,12,13,.70);border:1px solid rgba(255,255,255,.22);color:#fff;font:700 11px 'Orbitron',sans-serif;letter-spacing:1px}.reset3d{position:absolute;right:18px;bottom:18px;z-index:40;padding:9px 12px;border:1px solid rgba(255,255,255,.22);border-radius:9px;background:rgba(5,12,13,.78);color:#fff;font:700 10px 'Orbitron',sans-serif;cursor:pointer}
 </style>
@@ -351,12 +383,22 @@ def building_html():
 })();
 </script>
 """
+    tech_classes = []
+    if "☀️ 태양광 발전" in techs: tech_classes.append("solar")
+    if "🌬️ 자연환기" in techs: tech_classes.append("vent")
+    if "🪟 외부 차양" in techs: tech_classes.append("shade")
+    if "🌱 녹화 지붕" in techs: tech_classes.append("greenroof")
+    if "💧 빗물 이용" in techs: tech_classes.append("rain")
+    if "🔄 물 재이용" in techs: tech_classes.append("reuse")
+    tech_class = " ".join(tech_classes)
+
     return (html.replace("__SHAPE__", shape)
                 .replace("__USAGE__", usage)
                 .replace("__MATERIAL__", material)
                 .replace("__COLOR__", color)
                 .replace("__BADGE__", badge)
-                .replace("__FEATURES__", feature_html))
+                .replace("__FEATURES__", feature_html)
+                .replace("__TECH__", tech_class))
 
 
 def show_building():
@@ -472,7 +514,7 @@ elif st.session_state.page == "USAGE":
     st.session_state.usage=choice
     data=USAGES[choice]
     st.markdown(effect_card(choice,data["impact"],data["effect"],data["limit"]), unsafe_allow_html=True)
-    st.markdown("<div class='source-box'><b>환경 영향은 어떻게 반영했나?</b><br>건축물은 용도에 따라 필요한 냉난방, 조명, 장비, 물 사용 등이 달라질 수 있습니다. 이 게임에서는 그 차이를 이해하기 쉽도록 간단한 가상 점수로 반영했습니다.</div>", unsafe_allow_html=True)
+    st.markdown("""<div class='expert-box'><div class='expert-kicker'>ARCHITECTURE NOTE</div><h3>건축물의 용도는 필요한 환경을 결정해요.</h3><p>같은 크기의 건물이라도 주거시설, 학교, 병원처럼 <b>무엇을 하는 공간인지</b>에 따라 필요한 빛, 온도, 공기, 물, 전력의 조건이 달라집니다.</p><p><b>쉽게 말하면</b> 건축가는 먼저 건물에서 어떤 활동이 일어나는지 정한 뒤, 그 활동에 맞춰 공간과 설비를 계획합니다. 이 게임의 점수는 이런 차이를 이해하기 위한 가상 값입니다.</p></div>""", unsafe_allow_html=True)
     if st.button("다음 → 건축 형태", type="primary", use_container_width=True): st.session_state.page="SHAPE"; st.rerun()
 
 # =========================================================
@@ -499,7 +541,7 @@ elif st.session_state.page == "MATERIAL":
     show_building()
     data=MATERIALS[choice]
     st.markdown(effect_card(choice,data["impact"],data["effect"],data["limit"]), unsafe_allow_html=True)
-    st.markdown("<div class='source-box'><b>자료 근거</b><br>UNEP는 건축 자재의 생산과 사용에서 발생하는 탄소 영향을 줄이기 위해 자재 효율, 재사용·재활용, 저탄소 재료 등의 접근을 제시합니다. 이 프로그램은 이를 고등학교 수준의 게임 점수로 단순화했습니다.</div>", unsafe_allow_html=True)
+    st.markdown("""<div class='expert-box'><div class='expert-kicker'>MATERIAL SCIENCE</div><h3>건물의 겉모습뿐 아니라 재료가 만들어지는 과정도 중요해요.</h3><p>콘크리트와 철강 같은 재료는 건물을 튼튼하게 만드는 데 중요하지만, 재료를 생산하고 운반하는 과정에서도 환경 부담이 생길 수 있습니다.</p><p><b>그래서 건축에서는</b> 필요한 재료의 양을 줄이거나, 탄소 부담이 낮은 재료를 사용하거나, 기존 자재를 다시 활용하는 방법을 함께 생각합니다. 이 게임에서는 그 개념을 쉽게 비교할 수 있도록 표현했습니다.</p></div>""", unsafe_allow_html=True)
     if st.button("다음 → 미래 기술", type="primary", use_container_width=True): st.session_state.page="TECH"; st.rerun()
 
 # =========================================================
@@ -519,7 +561,7 @@ elif st.session_state.page == "TECH":
             if i+j>=len(items): continue
             title,data=items[i+j]
             with col: st.markdown(effect_card(title,data["impact"],data["effect"],data["limit"]), unsafe_allow_html=True)
-    st.markdown("<div class='source-box'><b>자료 근거</b><br>IPCC는 건축물의 기후 적응과 관련해 자연환기, 태양 차양, 녹화 지붕·벽, 식생, 물 관리 등의 방법을 다룹니다. IEA도 건물의 에너지 효율과 냉난방 수요를 중요한 요소로 설명합니다. 실제 효과는 지역과 설계 조건에 따라 달라지므로 여기서는 게임용 점수로 표현했습니다.</div>", unsafe_allow_html=True)
+    st.markdown("""<div class='expert-box'><div class='expert-kicker'>FUTURE BUILDING SYSTEM</div><h3>미래 건축은 건물이 환경과 어떻게 반응하는지도 생각해요.</h3><p>태양광은 전기를 만들고, 자연환기는 바람을 이용해 공기를 움직이며, 차양은 강한 햇빛의 유입을 조절합니다. 녹화 지붕과 물 관리 기술은 건물 주변의 열과 물을 다루는 데 활용할 수 있습니다.</p><p><b>중요한 점은</b> 기술 하나를 붙이는 것보다 건물의 방향, 창의 위치, 지역의 햇빛과 바람 같은 조건을 함께 고려하는 것입니다.</p></div>""", unsafe_allow_html=True)
     if st.button("다음 → 꾸미기", type="primary", use_container_width=True): st.session_state.page="DECOR"; st.rerun()
 
 # =========================================================
@@ -533,7 +575,7 @@ elif st.session_state.page == "DECOR":
     st.session_state.building_color=COLORS[color_name]
     st.session_state.building_color=st.color_picker("직접 색상 선택", st.session_state.building_color)
     show_building()
-    st.markdown("<div class='source-box'><b>COLOR RULE</b><br>색상은 환경 성능을 직접 결정하는 요소로 점수화하지 않았습니다. 대신 건축가가 같은 건축물의 분위기와 외관을 바꿀 수 있도록 했습니다.</div>", unsafe_allow_html=True)
+    st.markdown("""<div class='expert-box'><div class='expert-kicker'>ARCHITECTURAL EXPRESSION</div><h3>색은 건축물의 인상을 바꾸는 마지막 설계 요소예요.</h3><p>같은 형태와 재료라도 색에 따라 건물의 밝기, 무게감, 미래적인 느낌이 다르게 보일 수 있습니다.</p><p>이번 단계에서는 환경 성능보다 <b>건축가의 시각적 표현</b>에 집중해 색만 바꾸도록 했습니다.</p></div>""", unsafe_allow_html=True)
     if st.button("🏗️ 건축물 완성하기", type="primary", use_container_width=True):
         st.session_state.completed=True; st.session_state.page="HOME"; st.rerun()
 
@@ -560,7 +602,7 @@ elif st.session_state.page == "RESULT":
         data=TECHNOLOGIES[tech]
         st.markdown(effect_card(tech,data["impact"],data["effect"],data["limit"]), unsafe_allow_html=True)
 
-    st.markdown("<div class='source-box'><b>참고 자료</b><br>UNEP · Building Materials and the Climate<br>IPCC · Climate Change 2022: Impacts, Adaptation and Vulnerability, Chapter 6<br>IEA · Energy Efficiency 2025 - Buildings<br><br>※ 오염지수는 실제 탄소배출량이나 실제 건물 성능을 계산한 값이 아니라, 환경 영향을 비교해 보는 게임용 가상 점수입니다.</div>", unsafe_allow_html=True)
+    st.markdown("""<div class='expert-box'><div class='expert-kicker'>FINAL DESIGN REVIEW</div><h3>이 점수는 실제 탄소배출량이 아니라 설계 비교용 가상 지표입니다.</h3><p>실제 건물의 환경 성능은 건물의 크기, 위치, 기후, 재료의 생산 과정, 설비 효율, 사용 방식 등 여러 조건을 함께 계산해야 합니다.</p><p>따라서 이 게임에서는 복잡한 실제 계산 대신 <b>어떤 선택이 환경 부담을 줄이는 방향인지</b>를 한눈에 이해할 수 있도록 단순한 오염지수로 표현했습니다.</p></div>""", unsafe_allow_html=True)
     c1,c2=st.columns(2)
     with c1:
         if st.button("🏠 메인으로",use_container_width=True): st.session_state.page="HOME"; st.rerun()
