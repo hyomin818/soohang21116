@@ -81,6 +81,7 @@ st.session_state.setdefault("budget", 100)
 USAGES = {
     "🏠 미래 주거시설": {
         "impact": 4,
+        "cost": 10,
         "effect": "생활공간이므로 냉난방, 조명, 온수, 물 사용 등이 발생할 수 있습니다.",
         "limit": "실제 환경 영향은 건물 규모와 에너지 사용 방식에 따라 달라집니다.",
         "class": "housing",
@@ -88,6 +89,7 @@ USAGES = {
     },
     "🏫 미래 학교": {
         "impact": 2,
+        "cost": 8,
         "effect": "자연채광과 자연환기를 활용하기 쉬운 공간으로 설정해 오염지수 영향을 낮게 반영했습니다.",
         "limit": "실제 학교의 에너지 사용량은 지역, 운영시간, 냉난방 설비 등에 따라 달라집니다.",
         "class": "school",
@@ -95,6 +97,7 @@ USAGES = {
     },
     "🏥 미래 병원": {
         "impact": 6,
+        "cost": 16,
         "effect": "의료장비와 환기, 냉난방 등 지속적인 에너지 사용이 필요할 수 있어 게임에서는 높은 값을 적용했습니다.",
         "limit": "실제 병원의 환경 성능을 단순히 용도 하나만으로 판단할 수는 없습니다.",
         "class": "hospital",
@@ -102,6 +105,7 @@ USAGES = {
     },
     "🔬 미래 연구센터": {
         "impact": 3,
+        "cost": 12,
         "effect": "연구장비가 필요하지만 효율적인 공간과 설비를 설계할 수 있는 것으로 설정했습니다.",
         "limit": "실험 종류와 장비에 따라 에너지 사용량은 크게 달라질 수 있습니다.",
         "class": "research",
@@ -112,24 +116,28 @@ USAGES = {
 SHAPES = {
     "🏙️ 수직형 타워": {
         "impact": 7,
+        "cost": 18,
         "effect": "높이를 크게 확보해 같은 부지에 많은 공간을 넣는 형태입니다. 게임에서는 구조와 외피 사용량을 고려해 부담을 높게 반영했습니다.",
         "limit": "실제 환경 성능은 높이만으로 결정되지 않고 설계와 재료에 따라 달라집니다.",
         "class": "tower",
     },
     "🌿 테라스형 건축": {
         "impact": 3,
+        "cost": 15,
         "effect": "층마다 외부공간을 만들어 차양이나 녹지를 적용하기 쉬운 형태로 설정했습니다.",
         "limit": "테라스가 많아지면 구조와 외피가 복잡해질 수도 있습니다.",
         "class": "terrace",
     },
     "🛸 돔형 건축": {
         "impact": 2,
+        "cost": 22,
         "effect": "곡면 외피를 가진 미래형 형태로 표현해 외부 환경에 대응하는 건축물로 설정했습니다.",
         "limit": "곡면 구조는 제작과 시공 방식에 따라 재료와 비용이 달라질 수 있습니다.",
         "class": "dome",
     },
     "🌍 저층 생태형": {
         "impact": 1,
+        "cost": 12,
         "effect": "낮은 건물과 넓은 외부공간을 활용해 녹지와 건축물을 연결하기 쉬운 형태로 설정했습니다.",
         "limit": "넓은 부지가 필요할 수 있어 모든 지역에 적합한 형태는 아닙니다.",
         "class": "eco",
@@ -234,9 +242,11 @@ def pollution_score():
     return max(0, min(100, score))
 
 def design_cost():
-    total = MATERIALS[st.session_state.material]["cost"]
-    for tech in st.session_state.technologies:
-        total += TECHNOLOGIES[tech]["cost"]
+    # 예산은 용도, 형태, 자재, 미래 기술을 고를 때마다 차감됩니다.
+    total = USAGES[st.session_state.usage]["cost"]
+    total += SHAPES[st.session_state.shape]["cost"]
+    total += MATERIALS[st.session_state.material]["cost"]
+    total += sum(TECHNOLOGIES[tech]["cost"] for tech in st.session_state.technologies)
     return total
 
 def remaining_budget():
@@ -542,7 +552,7 @@ with st.sidebar:
     st.progress(max(0, min(1, remain / st.session_state.budget)) if st.session_state.budget else 0)
     budget_color = "#8ef0c5" if remain >= 0 else "#ff7d7d"
     st.markdown(f"<div style='font:800 26px Orbitron;color:{budget_color};'>{budget_text(remain)}<span style='font-size:12px;color:#aebfbc;'> / {st.session_state.budget:,}억원</span></div>", unsafe_allow_html=True)
-    st.caption(f"사용 금액 {cost:,}억 · 자재와 미래 기술에 따라 비용이 달라집니다.")
+    st.caption(f"사용 금액 {cost:,}억원 · 용도, 형태, 자재, 미래 기술을 선택할 때마다 예산이 차감됩니다.")
     if remain < 0: st.error("예산 초과 · 선택을 조정해 주세요.")
 
     score=pollution_score()
@@ -593,7 +603,7 @@ if st.session_state.page == "HOME":
             <div style="position:absolute;left:28px;top:28px;padding:14px 17px;background:rgba(5,10,11,.68);border-left:3px solid #d9b57d;color:#fff;font:700 12px Orbitron,sans-serif;letter-spacing:1px;">EARTH // 2050<br><span style="color:#d8c0b1;font-family:'Noto Sans KR';font-size:12px;">DESERTIFICATION / CRITICAL</span></div>
             <div style="position:absolute;left:50%;top:57%;transform:translate(-50%,-50%);color:rgba(255,255,255,.9);font:800 35px Orbitron,sans-serif;text-align:center;text-shadow:0 3px 25px rgba(0,0,0,.65);">THE LAST<br>BUILDING</div>
         </div>
-        """)
+        """, unsafe_allow_html=True)
         st.markdown("""
         <div class="card" style="margin-top:18px;">
             <div class="effect-label">MISSION 2050</div>
@@ -611,8 +621,14 @@ if st.session_state.page == "HOME":
 elif st.session_state.page == "USAGE":
     st.markdown("<div class='hero-title' style='font-size:42px;'>01 / BUILDING USE</div>", unsafe_allow_html=True)
     st.markdown("<div class='hero-sub'>WHAT WILL YOUR BUILDING DO?</div>", unsafe_allow_html=True)
-    choice=st.radio("건축물의 용도를 선택하세요.", list(USAGES), index=list(USAGES).index(st.session_state.usage))
+    current_usage = st.session_state.usage
+    fixed_cost = SHAPES[st.session_state.shape]["cost"] + MATERIALS[st.session_state.material]["cost"] + sum(TECHNOLOGIES[t]["cost"] for t in st.session_state.technologies)
+    available_usages = [name for name, data in USAGES.items() if fixed_cost + data["cost"] <= st.session_state.budget or name == current_usage]
+    choice=st.radio("건축물의 용도를 선택하세요. (예산이 부족한 선택지는 목록에서 제외됩니다.)", available_usages, index=available_usages.index(current_usage), format_func=lambda x: f"{x} · {USAGES[x]['cost']}억원")
     st.session_state.usage=choice
+    unavailable_usages = [name for name, data in USAGES.items() if fixed_cost + data["cost"] > st.session_state.budget and name != current_usage]
+    if unavailable_usages:
+        st.caption("예산 부족으로 선택 불가: " + " · ".join(f"{name} ({USAGES[name]['cost']}억원)" for name in unavailable_usages))
     data=USAGES[choice]
     st.markdown(effect_card(choice,data["impact"],data["effect"],data["limit"], data.get("cost")), unsafe_allow_html=True)
     st.markdown("""<div class='expert-box'><div class='expert-kicker'>ARCHITECTURE NOTE</div><h3>건축물의 용도는 필요한 환경을 결정해요.</h3><p>같은 크기의 건물이라도 주거시설, 학교, 병원처럼 <b>무엇을 하는 공간인지</b>에 따라 필요한 빛, 온도, 공기, 물, 전력의 조건이 달라집니다.</p><p><b>쉽게 말하면</b> 건축가는 먼저 건물에서 어떤 활동이 일어나는지 정한 뒤, 그 활동에 맞춰 공간과 설비를 계획합니다. 이 게임의 점수는 이런 차이를 이해하기 위한 가상 값입니다.</p></div>""", unsafe_allow_html=True)
@@ -624,8 +640,14 @@ elif st.session_state.page == "USAGE":
 elif st.session_state.page == "SHAPE":
     st.markdown("<div class='hero-title' style='font-size:42px;'>02 / FORM</div>", unsafe_allow_html=True)
     st.markdown("<div class='hero-sub'>CHANGE THE ARCHITECTURE ITSELF.</div>", unsafe_allow_html=True)
-    choice=st.radio("건축 형태를 선택하세요.", list(SHAPES), index=list(SHAPES).index(st.session_state.shape))
+    current_shape = st.session_state.shape
+    fixed_cost = USAGES[st.session_state.usage]["cost"] + MATERIALS[st.session_state.material]["cost"] + sum(TECHNOLOGIES[t]["cost"] for t in st.session_state.technologies)
+    available_shapes = [name for name, data in SHAPES.items() if fixed_cost + data["cost"] <= st.session_state.budget or name == current_shape]
+    choice=st.radio("건축 형태를 선택하세요. (예산이 부족한 선택지는 목록에서 제외됩니다.)", available_shapes, index=available_shapes.index(current_shape), format_func=lambda x: f"{x} · {SHAPES[x]['cost']}억원")
     st.session_state.shape=choice
+    unavailable_shapes = [name for name, data in SHAPES.items() if fixed_cost + data["cost"] > st.session_state.budget and name != current_shape]
+    if unavailable_shapes:
+        st.caption("예산 부족으로 선택 불가: " + " · ".join(f"{name} ({SHAPES[name]['cost']}억원)" for name in unavailable_shapes))
     show_building()
     data=SHAPES[choice]
     st.markdown(effect_card(choice,data["impact"],data["effect"],data["limit"], data.get("cost")), unsafe_allow_html=True)
@@ -638,14 +660,13 @@ elif st.session_state.page == "MATERIAL":
     st.markdown("<div class='hero-title' style='font-size:42px;'>03 / MATERIAL</div>", unsafe_allow_html=True)
     st.markdown("<div class='hero-sub'>THE MATERIAL CHANGES THE BUILDING.</div>", unsafe_allow_html=True)
     current_material = st.session_state.material
-    choice=st.radio("건축 자재를 선택하세요.", list(MATERIALS), index=list(MATERIALS).index(current_material), format_func=lambda x: f"{x}  ·  {MATERIALS[x]['cost']}억원")
-    candidate_total = MATERIALS[choice]["cost"] + sum(TECHNOLOGIES[t]["cost"] for t in st.session_state.technologies)
-    if candidate_total <= st.session_state.budget:
-        st.session_state.material=choice
-    else:
-        st.warning(f"💸 {choice}는 현재 선택한 미래 기술과 함께 사용하면 {candidate_total - st.session_state.budget}억원이 부족합니다. 예산 안의 조합을 위해 기존 자재를 유지합니다.")
-        st.session_state.material=current_material
-        choice=current_material
+    fixed_cost = USAGES[st.session_state.usage]["cost"] + SHAPES[st.session_state.shape]["cost"] + sum(TECHNOLOGIES[t]["cost"] for t in st.session_state.technologies)
+    available_materials = [name for name, data in MATERIALS.items() if fixed_cost + data["cost"] <= st.session_state.budget or name == current_material]
+    choice=st.radio("건축 자재를 선택하세요. (예산이 부족한 선택지는 목록에서 제외됩니다.)", available_materials, index=available_materials.index(current_material), format_func=lambda x: f"{x}  ·  {MATERIALS[x]['cost']}억원")
+    st.session_state.material=choice
+    unavailable_materials = [name for name, data in MATERIALS.items() if fixed_cost + data["cost"] > st.session_state.budget and name != current_material]
+    if unavailable_materials:
+        st.caption("예산 부족으로 선택 불가: " + " · ".join(f"{name} ({MATERIALS[name]['cost']}억원)" for name in unavailable_materials))
     show_building()
     data=MATERIALS[choice]
     st.markdown(effect_card(choice,data["impact"],data["effect"],data["limit"], data.get("cost")), unsafe_allow_html=True)
@@ -658,13 +679,14 @@ elif st.session_state.page == "MATERIAL":
 elif st.session_state.page == "TECH":
     st.markdown("<div class='hero-title' style='font-size:42px;'>04 / FUTURE TECH</div>", unsafe_allow_html=True)
     st.markdown("<div class='hero-sub'>EVERY TECHNOLOGY HAS AN ENVIRONMENTAL EFFECT.</div>", unsafe_allow_html=True)
-    st.markdown("<div class='card'><b>💰 초기 설계 예산 100억원</b><br><span class='small-note'>오염지수 감축 효과가 큰 미래 기술은 더 비싸게 설정되어 있습니다. 예산이 부족하면 해당 기술을 추가할 수 없습니다.</span></div>", unsafe_allow_html=True)
-    material_cost = MATERIALS[st.session_state.material]["cost"]
+    st.markdown("<div class='card'><b>💰 초기 설계 예산 100억원</b><br><span class='small-note'>용도·형태·자재·미래 기술을 고를 때마다 비용이 차감됩니다. 오염지수 감축 효과가 큰 기술과 환경 부담이 낮은 자재는 대체로 비싸게 설정되어 있습니다. 예산이 부족하면 해당 선택을 할 수 없습니다.</span></div>", unsafe_allow_html=True)
+    base_cost = USAGES[st.session_state.usage]["cost"] + SHAPES[st.session_state.shape]["cost"] + MATERIALS[st.session_state.material]["cost"]
     selected=[]
-    running_cost = material_cost
+    old_technologies = list(st.session_state.technologies)
     for tech, data in TECHNOLOGIES.items():
-        was_selected = tech in st.session_state.technologies
-        can_afford = was_selected or (running_cost + data["cost"] <= st.session_state.budget)
+        was_selected = tech in old_technologies
+        other_selected_cost = sum(TECHNOLOGIES[t]["cost"] for t in old_technologies if t != tech)
+        can_afford = was_selected or (base_cost + other_selected_cost + data["cost"] <= st.session_state.budget)
         checked = st.checkbox(
             f"{tech}  ·  {data['cost']}억원  ·  오염지수 {data['impact']:+d}",
             value=was_selected,
@@ -673,10 +695,9 @@ elif st.session_state.page == "TECH":
         )
         if checked:
             selected.append(tech)
-            running_cost += data["cost"]
     st.session_state.technologies=selected
     tech_cost = sum(TECHNOLOGIES[t]["cost"] for t in selected)
-    total_cost = material_cost + tech_cost
+    total_cost = base_cost + tech_cost
     remain_after = st.session_state.budget - total_cost
     if remain_after >= 0:
         st.info(f"💰 현재 자재 + 미래 기술 비용: {total_cost:,}억원 · 남은 예산: {remain_after:,}억원")
