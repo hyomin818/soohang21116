@@ -568,6 +568,7 @@ with st.sidebar:
             st.session_state.page=page
             st.rerun()
 
+    st.page_link("pages/chat.py", label="💬 완성된 건물의 주민과 대화", icon="💬", use_container_width=True)
     st.divider()
     cost = design_cost()
     remain = remaining_budget()
