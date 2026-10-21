@@ -233,16 +233,22 @@ COLORS = {
 # 점수
 # =========================================================
 def pollution_score():
-    score = 42
-    score += USAGES[st.session_state.usage]["impact"]
-    score += SHAPES[st.session_state.shape]["impact"]
-    score += MATERIALS[st.session_state.material]["impact"]
-    for tech in st.session_state.technologies:
-        score += TECHNOLOGIES[tech]["impact"]
-    return max(0, min(100, score))
+    # 게임 시작 화면은 반드시 100으로 시작합니다. 설계를 시작하면
+    # 선택한 용도·형태·자재·기술의 영향값만큼 지수를 차감합니다.
+    if st.session_state.page == "HOME" and not st.session_state.completed:
+        return 100
+    reduction = abs(USAGES[st.session_state.usage]["impact"])
+    reduction += abs(SHAPES[st.session_state.shape]["impact"])
+    reduction += abs(MATERIALS[st.session_state.material]["impact"])
+    # 미래 기술은 건물 운영 중의 환경 부담을 지속적으로 줄이는 핵심 요소이므로
+    # 게임 안에서는 기술별 표시 영향값의 2배를 감축 점수로 반영합니다.
+    reduction += 2 * sum(abs(TECHNOLOGIES[tech]["impact"]) for tech in st.session_state.technologies)
+    return max(0, 100 - reduction)
 
 def design_cost():
-    # 예산은 용도, 형태, 자재, 미래 기술을 고를 때마다 차감됩니다.
+    # HOME 첫 화면에서는 아직 설계를 시작하지 않았으므로 예산을 100억원 그대로 보여줍니다.
+    if st.session_state.page == "HOME" and not st.session_state.completed:
+        return 0
     total = USAGES[st.session_state.usage]["cost"]
     total += SHAPES[st.session_state.shape]["cost"]
     total += MATERIALS[st.session_state.material]["cost"]
@@ -275,6 +281,16 @@ def building_html():
     side_feature_html = ""
     roof_feature_html = ""
     dome_feature_html = ""
+    # Curved meridian arches occupy different 3D planes, so the dome stays rounded during a full rotation.
+    dome_meridians_html = "".join(
+        f'<div class="dome-meridian" style="--angle:{angle}deg"></div>'
+        for angle in range(0, 180, 15)
+    )
+    dome_windows_html = "".join(
+        f'<div class="dome-window" style="--angle:{angle}deg;--window-y:{y}px;--window-x:{x}px"></div>'
+        for angle in range(0, 360, 45)
+        for y, x in ((62, -36), (92, -22), (122, -4))
+    )
     techs = st.session_state.technologies
     if "☀️ 태양광 발전" in techs:
         feature_html += '<div class="solar-panel sp1"></div><div class="solar-panel sp2"></div>'
@@ -337,9 +353,11 @@ def building_html():
             <div class="face top"><div class="surface-tech"></div><div class="roof-grid"></div><div class="skylight s1"></div><div class="skylight s2"></div><div class="skylight s3"></div>__ROOF_FEATURES__</div>
             <div class="face bottom"><div class="surface-tech"></div></div>
             <div class="dome-shell">
-                <div class="dome-band band1"></div><div class="dome-band band2"></div><div class="dome-band band3"></div><div class="dome-band band4"></div><div class="dome-band band5"></div><div class="dome-meridian dm1"></div><div class="dome-meridian dm2"></div><div class="dome-meridian dm3"></div>
-                <div class="dome-window dw1"></div><div class="dome-window dw2"></div><div class="dome-window dw3"></div><div class="dome-window dw4"></div><div class="dome-window dw5"></div><div class="dome-window dw6"></div><div class="dome-window dw7"></div><div class="dome-window dw8"></div>
-                <div class="dome-ring dr1"></div><div class="dome-ring dr2"></div>
+                <div class="dome-skin"></div>
+                __DOME_MERIDIANS__
+                <div class="dome-latitude latitude1"></div><div class="dome-latitude latitude2"></div><div class="dome-latitude latitude3"></div>
+                __DOME_WINDOWS__
+                <div class="dome-base-ring"></div>
                 __DOME_FEATURES__
             </div>
         </div>
@@ -363,8 +381,8 @@ def building_html():
 .crack{position:absolute;height:2px;background:rgba(51,30,23,.5);transform-origin:left center}.c1{width:190px;left:25%;top:24%;transform:rotate(18deg)}.c2{width:260px;left:53%;top:40%;transform:rotate(-12deg)}.c3{width:150px;left:40%;top:62%;transform:rotate(8deg)}
 .dune-line{position:absolute;height:2px;border-radius:50%;background:rgba(245,203,145,.16)}.dl1{width:62%;left:17%;top:25%;transform:rotate(-4deg)}.dl2{width:45%;right:15%;top:51%;transform:rotate(6deg)}
 .rock{position:absolute;background:linear-gradient(145deg,#6e4937,#281c19);clip-path:polygon(5% 100%,24% 36%,55% 8%,85% 40%,100% 100%)}.r1{width:100px;height:70px;left:9%;top:18%}.r2{width:150px;height:84px;right:10%;top:26%}.r3{width:78px;height:50px;right:29%;top:13%}
-.building-stage{position:absolute;left:50%;top:48%;width:440px;height:430px;transform:translate(-50%,-50%);transform-style:preserve-3d}
-.building-3d{--w:210px;--h:310px;--d:150px;--building-color:#5D7F7A;position:absolute;left:50%;bottom:18px;width:var(--w);height:var(--h);transform-style:preserve-3d;transform-origin:center center;transform:translateX(-50%) rotateX(-4deg) rotateY(0deg)}
+.building-stage{position:absolute;left:50%;top:50%;width:440px;height:500px;transform:translate(-50%,-50%);transform-style:preserve-3d;display:flex;align-items:center;justify-content:center}
+.building-3d{--w:210px;--h:310px;--d:150px;--building-color:#5D7F7A;position:absolute;left:50%;top:50%;bottom:auto;width:var(--w);height:var(--h);transform-style:preserve-3d;transform-origin:center center;transform:translate(-50%,-50%) rotateX(-4deg) rotateY(0deg)}
 .building-3d.tower{--w:180px;--h:350px;--d:130px}.building-3d.terrace{--w:240px;--h:285px;--d:165px}.building-3d.dome{--w:280px;--h:250px;--d:190px}.building-3d.eco{--w:300px;--h:215px;--d:210px}
 .face{position:absolute;box-sizing:border-box;border:1px solid rgba(235,255,247,.27);overflow:hidden;backface-visibility:hidden}.front,.back{width:var(--w);height:var(--h)}.front{transform:translateZ(calc(var(--d)/2));background:linear-gradient(90deg,rgba(255,255,255,.09),transparent 18%,transparent 82%,rgba(0,0,0,.18)),var(--building-color)}.back{transform:rotateY(180deg) translateZ(calc(var(--d)/2));background:#263735}.right,.left{width:var(--d);height:var(--h);left:calc((var(--w) - var(--d))/2)}.right{transform:rotateY(90deg) translateZ(calc(var(--w)/2));background:linear-gradient(90deg,#172827,#4a625d)}.left{transform:rotateY(-90deg) translateZ(calc(var(--w)/2));background:linear-gradient(90deg,#4a625d,#162424)}.top,.bottom{width:var(--w);height:var(--d);top:calc((var(--h) - var(--d))/2)}.top{transform:rotateX(90deg) translateZ(calc(var(--h)/2));background:linear-gradient(135deg,#899a91,#354945)}.bottom{transform:rotateX(-90deg) translateZ(calc(var(--h)/2));background:#0c1617}
 .concrete .face{background:repeating-linear-gradient(0deg,rgba(255,255,255,.025) 0 3px,transparent 3px 14px),linear-gradient(90deg,rgba(255,255,255,.08),transparent 20%,rgba(0,0,0,.16)),var(--building-color)}
@@ -372,7 +390,10 @@ def building_html():
 .wood .face{background:repeating-linear-gradient(90deg,rgba(72,39,22,.15) 0 3px,transparent 3px 15px),linear-gradient(90deg,rgba(255,255,255,.07),transparent 30%,rgba(0,0,0,.12)),var(--building-color)}
 .recycled .face{background:repeating-linear-gradient(45deg,rgba(255,255,255,.10) 0 8px,transparent 8px 18px),linear-gradient(135deg,rgba(255,255,255,.08),transparent 45%,rgba(0,0,0,.14)),var(--building-color)}
 .concrete .top,.concrete .bottom,.steel .top,.steel .bottom,.wood .top,.wood .bottom,.recycled .top,.recycled .bottom{background-image:inherit}
-.terrace .front{clip-path:polygon(0 0,100% 0,100% 100%,0 100%,0 74%,8% 74%,8% 57%,0 57%,0 40%,8% 40%,8% 23%,0 23%)}
+.terrace .front,.terrace .back{background-image:repeating-linear-gradient(0deg,transparent 0 62px,rgba(220,235,228,.85) 62px 69px,rgba(25,43,43,.55) 69px 73px,transparent 73px 83px),linear-gradient(90deg,rgba(255,255,255,.09),transparent 18%,transparent 82%,rgba(0,0,0,.18)),var(--building-color)}
+.terrace .left,.terrace .right{background-image:repeating-linear-gradient(0deg,transparent 0 62px,rgba(220,235,228,.82) 62px 69px,rgba(25,43,43,.55) 69px 73px,transparent 73px 83px),linear-gradient(90deg,#172827,#4a625d)}
+.terrace .top{background:repeating-linear-gradient(90deg,transparent 0 42px,rgba(225,242,235,.72) 42px 47px),linear-gradient(135deg,#899a91,#354945)}
+.terrace .front{clip-path:none}
 .dome .face.front,.dome .face.back,.dome .face.left,.dome .face.right{background:rgba(0,0,0,0)!important;border-color:transparent!important}
 /* 360-degree building detailing */
 .side-solar{position:absolute;z-index:9;width:42px;height:72px;border:1px solid rgba(151,235,220,.5);background:repeating-linear-gradient(90deg,rgba(170,255,242,.24) 0 1px,transparent 1px 8px),#173c43;box-shadow:0 0 10px rgba(120,230,204,.10)}
@@ -386,24 +407,24 @@ def building_html():
 .roof-water{position:absolute;z-index:10;right:24px;top:18px;width:26px;height:26px;border:2px solid #78c9dc;border-radius:50%;background:rgba(27,105,126,.6)}
 .side-reuse{position:absolute;z-index:10;width:27px;height:27px;border:2px dashed #82e0ca;border-radius:50%;color:#dffff7;font-size:18px;text-align:center;line-height:23px;background:rgba(7,30,29,.65)}.sru1{left:15px;bottom:22px}.sru2{right:15px;top:24px}
 
-.dome .face.top{opacity:.25}
-.dome .dome-shell{position:absolute;left:50%;bottom:0;width:280px;height:225px;transform:translateX(-50%);transform-style:preserve-3d;z-index:7;pointer-events:none}
-.dome-band{position:absolute;left:50%;bottom:0;width:250px;height:190px;transform:translateX(-50%);border:2px solid rgba(230,255,248,.32);border-bottom:0;border-radius:50% 50% 0 0;clip-path:polygon(9% 100%,91% 100%,72% 55%,62% 25%,50% 0,38% 25%,28% 55%);background:linear-gradient(90deg,rgba(255,255,255,.10),rgba(255,255,255,.03) 48%,rgba(0,0,0,.18)),var(--building-color);transform-origin:center bottom}
-.band1{transform:translateX(-50%) translateZ(22px)}
-.band2{transform:translateX(-50%) translateZ(0) scale(.92);opacity:.72}
-.band3{transform:translateX(-50%) translateZ(-22px) scale(.84);opacity:.52}
-.dome-shell:before,.dome-shell:after{content:"";position:absolute;left:50%;bottom:0;width:242px;height:175px;transform:translateX(-50%) rotateY(90deg);border:2px solid rgba(230,255,248,.24);border-bottom:0;border-radius:50% 50% 0 0;clip-path:polygon(9% 100%,91% 100%,72% 55%,62% 25%,50% 0,38% 25%,28% 55%);background:rgba(110,180,164,.10)}
-.dome-shell:after{transform:translateX(-50%) rotateY(45deg);opacity:.6}
-.dome-meridian{position:absolute;left:50%;bottom:0;width:238px;height:190px;transform:translateX(-50%);border:2px solid rgba(230,255,248,.20);border-bottom:0;border-radius:50% 50% 0 0;clip-path:polygon(9% 100%,91% 100%,72% 55%,62% 25%,50% 0,38% 25%,28% 55%);pointer-events:none;z-index:11}.dm1{transform:translateX(-50%) rotateY(35deg)}.dm2{transform:translateX(-50%) rotateY(-35deg);opacity:.7}.dm3{transform:translateX(-50%) rotateY(90deg);opacity:.55}
-.dome-window{position:absolute;width:30px;height:24px;border:1px solid rgba(239,255,251,.55);background:linear-gradient(135deg,#e8fff8,#5aa596);border-radius:45% 45% 20% 20%;box-shadow:0 0 12px rgba(120,230,204,.18);z-index:12}
-.dw1{left:28px;bottom:58px;transform:rotate(-15deg)}.dw2{left:83px;bottom:103px}.dw3{right:83px;bottom:103px}.dw4{right:28px;bottom:58px;transform:rotate(15deg)}
-.dome-ring{position:absolute;left:50%;transform:translateX(-50%);border:1px solid rgba(225,255,247,.34);border-radius:50%;z-index:13;pointer-events:none}.dr1{bottom:48px;width:222px;height:40px}.dr2{bottom:103px;width:150px;height:30px;opacity:.65}
-.dome-tech{position:absolute;z-index:14;pointer-events:none}.solar-dome{left:50%;top:18px;transform:translateX(-50%);width:88px;height:38px;border:1px solid #8de2d1;background:repeating-linear-gradient(90deg,rgba(170,255,242,.28) 0 1px,transparent 1px 14px),#163944;clip-path:polygon(18% 100%,82% 100%,65% 0,35% 0)}
-.vent-dome{left:50%;top:68px;transform:translateX(-50%);width:40px;height:40px;border:2px solid #9bded0;border-radius:50%;color:#e5fff9;font:700 7px Orbitron,sans-serif;text-align:center;line-height:36px}
-.dome-shade{position:absolute;left:50%;width:86px;height:7px;transform:translateX(-50%);background:#c5cfca;border-radius:4px;z-index:15}.ds1{top:92px}.ds2{top:122px}
+.dome .face.top{opacity:0!important}
+.dome .face.bottom{opacity:0!important}
+.dome-shell{display:none;position:absolute;left:50%;bottom:0;width:300px;height:245px;transform:translateX(-50%);transform-style:preserve-3d;z-index:7;pointer-events:none}
+.dome .dome-shell{display:block}
+.dome-skin{position:absolute;left:50%;bottom:0;width:286px;height:236px;transform:translateX(-50%);transform-origin:center bottom;border:2px solid rgba(28,38,43,.85);border-bottom:0;border-radius:50% 50% 0 0;background:linear-gradient(110deg,rgba(18,31,42,.92) 0%,rgba(86,103,112,.86) 42%,rgba(215,223,218,.94) 78%,rgba(46,61,70,.95) 100%);box-shadow:inset 18px 0 24px rgba(0,0,0,.30),inset -18px 0 24px rgba(255,255,255,.16);overflow:hidden}
+.dome-skin:before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(60deg,transparent 0 27px,rgba(15,27,34,.78) 28px 30px,transparent 31px 54px),repeating-linear-gradient(-60deg,transparent 0 27px,rgba(15,27,34,.78) 28px 30px,transparent 31px 54px),repeating-linear-gradient(0deg,transparent 0 31px,rgba(15,27,34,.75) 32px 34px,transparent 35px 62px);opacity:.92}
+.dome-skin:after{content:"";position:absolute;inset:0;background:linear-gradient(105deg,rgba(0,0,0,.28),transparent 36%,rgba(255,255,255,.20) 78%,rgba(0,0,0,.12));}
+.dome-meridian{position:absolute;left:50%;bottom:0;width:282px;height:235px;transform:translateX(-50%) rotateY(var(--angle));transform-origin:center bottom;border-left:2px solid rgba(15,26,33,.82);border-right:2px solid rgba(15,26,33,.82);border-top:2px solid rgba(15,26,33,.58);border-radius:50% 50% 0 0;backface-visibility:visible;z-index:9}
+.dome-latitude{position:absolute;left:50%;border:2px solid rgba(17,28,35,.78);border-bottom:0;border-radius:50% 50% 0 0;transform:translateX(-50%);z-index:10}
+.latitude1{bottom:0;width:278px;height:55px}.latitude2{bottom:0;width:228px;height:112px}.latitude3{bottom:0;width:150px;height:171px}
+.dome-base-ring{position:absolute;left:50%;bottom:-2px;width:288px;height:23px;transform:translateX(-50%) rotateX(65deg);border:3px solid #26353c;border-radius:50%;background:linear-gradient(90deg,#3d4c54,#aeb7b5,#3a4950);z-index:15}
+.dome-window{position:absolute;left:calc(50% + var(--window-x));bottom:var(--window-y);width:25px;height:20px;transform:rotateY(var(--angle)) translateZ(143px);border:2px solid rgba(18,29,35,.88);background:linear-gradient(135deg,#b9d5d9,#243f50 70%);border-radius:3px 3px 1px 1px;box-shadow:inset 0 0 6px rgba(255,255,255,.25);z-index:12;backface-visibility:visible}
+.dome-tech{position:absolute;z-index:16;pointer-events:none}.solar-dome{left:50%;top:18px;transform:translateX(-50%);width:78px;height:32px;border:2px solid #243e4b;background:repeating-linear-gradient(90deg,rgba(170,225,235,.55) 0 2px,transparent 2px 13px),repeating-linear-gradient(0deg,rgba(170,225,235,.45) 0 2px,transparent 2px 12px),#244a5b;clip-path:polygon(20% 100%,80% 100%,63% 0,37% 0)}
+.vent-dome{left:50%;top:70px;transform:translateX(-50%);width:34px;height:34px;border:3px solid #a6d5d6;border-radius:50%;color:#e5fff9;font:700 7px Orbitron,sans-serif;text-align:center;line-height:28px;background:#263d46}
+.dome-shade{position:absolute;left:50%;width:94px;height:6px;transform:translateX(-50%);background:#c5cfca;border:1px solid #5b686b;border-radius:4px;z-index:16}.ds1{top:94px}.ds2{top:125px}
 .dome-green{left:50%;top:-2px;transform:translateX(-50%);width:120px;height:18px;border-radius:50%;background:linear-gradient(#86b877,#355e3c);color:#eaffdf;text-align:center;font:700 7px Orbitron,sans-serif;line-height:18px}
-.dome-water{right:35px;bottom:35px;width:36px;height:36px;border:2px solid #78c9dc;border-radius:50%;color:#dffaff;font:700 6px Orbitron,sans-serif;text-align:center;line-height:36px;background:rgba(27,105,126,.55)}
-.dome-reuse{left:35px;bottom:34px;width:34px;height:34px;border:2px dashed #82e0ca;border-radius:50%;color:#dffff7;font-size:22px;text-align:center;line-height:30px}
+.dome-water{right:35px;bottom:35px;width:30px;height:30px;border:2px solid #78c9dc;border-radius:50%;color:#dffaff;font:700 6px Orbitron,sans-serif;text-align:center;line-height:26px;background:rgba(27,105,126,.85)}
+.dome-reuse{left:35px;bottom:34px;width:30px;height:30px;border:2px dashed #82e0ca;border-radius:50%;color:#dffff7;font-size:20px;text-align:center;line-height:26px}
 .eco .front{border-radius:18px 18px 5px 5px;background:linear-gradient(180deg,rgba(116,170,116,.30),transparent 30%),var(--building-color)}
 .top-cap{position:absolute;left:4%;right:4%;top:0;height:9px;background:rgba(226,246,238,.34)}
 .badge{position:absolute;top:14px;right:14px;z-index:9;padding:5px 8px;background:rgba(0,0,0,.30);border:1px solid rgba(255,255,255,.28);color:#eafff7;font:700 10px 'Orbitron',sans-serif;letter-spacing:1px}
@@ -457,7 +478,7 @@ def building_html():
     const reset=document.getElementById('reset3d');
     if(!viewer || !building) return;
     let rotY=0, rotX=-4, dragging=false, lastX=0, lastY=0;
-    function render(){ building.style.transform='translateX(-50%) rotateX('+rotX+'deg) rotateY('+rotY+'deg)'; }
+    function render(){ building.style.transform='translate(-50%,-50%) rotateX('+rotX+'deg) rotateY('+rotY+'deg)'; }
     viewer.addEventListener('pointerdown',function(e){
         if(e.target===reset) return;
         dragging=true; lastX=e.clientX; lastY=e.clientY;
@@ -495,6 +516,8 @@ def building_html():
                 .replace("__SIDE_FEATURES__", side_feature_html)
                 .replace("__ROOF_FEATURES__", roof_feature_html)
                 .replace("__DOME_FEATURES__", dome_feature_html)
+                .replace("__DOME_MERIDIANS__", dome_meridians_html)
+                .replace("__DOME_WINDOWS__", dome_windows_html)
                 .replace("__TECH__", tech_class))
 
 
@@ -549,7 +572,7 @@ with st.sidebar:
     cost = design_cost()
     remain = remaining_budget()
     st.markdown("### 💰 설계 예산")
-    st.progress(max(0, min(1, remain / st.session_state.budget)) if st.session_state.budget else 0)
+    st.progress(max(0, min(1, remain / 100)) )
     budget_color = "#8ef0c5" if remain >= 0 else "#ff7d7d"
     st.markdown(f"<div style='font:800 26px Orbitron;color:{budget_color};'>{budget_text(remain)}<span style='font-size:12px;color:#aebfbc;'> / {st.session_state.budget:,}억원</span></div>", unsafe_allow_html=True)
     st.caption(f"사용 금액 {cost:,}억원 · 용도, 형태, 자재, 미래 기술을 선택할 때마다 예산이 차감됩니다.")
@@ -594,7 +617,7 @@ if st.session_state.page == "HOME":
                 st.session_state.material="🧱 저탄소 콘크리트"
                 st.session_state.technologies=[]
                 st.session_state.building_color="#5D7F7A"
-                st.session_state.page="USAGE"; st.rerun()
+                st.session_state.page="HOME"; st.rerun()
     else:
         st.markdown("""
         <div style="height:520px;border-radius:26px;overflow:hidden;position:relative;border:1px solid rgba(255,235,205,.20);background:radial-gradient(circle at 75% 22%,rgba(255,221,159,.82) 0 55px,transparent 165px),linear-gradient(180deg,#151e20 0%,#55483e 47%,#a16d49 100%);box-shadow:0 30px 80px rgba(0,0,0,.45);">
@@ -608,7 +631,7 @@ if st.session_state.page == "HOME":
         <div class="card" style="margin-top:18px;">
             <div class="effect-label">MISSION 2050</div>
             <h2 style="margin:7px 0 10px;">황량해진 지구에 단 하나의 건축물을 설계하라.</h2>
-            <div class="small-note">용도 → 형태 → 자재 → 미래 기술 → 색상 순서로 선택합니다. 선택할 때마다 건물 외관이 실제로 달라지고, 환경 요소에 따라 오염지수도 변합니다. 완성 후 메인 화면에서 건물을 마우스로 드래그해 360°로 돌려볼 수 있습니다.</div>
+            <div class="small-note">시작 시 예산은 100억원, 오염지수는 100입니다. 설계를 시작해 용도 → 형태 → 자재 → 미래 기술을 선택할 때마다 비용이 차감되고 오염지수가 내려갑니다. 선택할 때마다 건물 외관도 달라집니다. 완성 후 메인 화면에서 건물을 마우스로 드래그해 360°로 돌려볼 수 있습니다.</div>
         </div>
         """, unsafe_allow_html=True)
         st.markdown("")
@@ -763,4 +786,4 @@ elif st.session_state.page == "RESULT":
         if st.button("🏠 메인으로",use_container_width=True): st.session_state.page="HOME"; st.rerun()
     with c2:
         if st.button("🔄 처음부터 다시 설계",use_container_width=True):
-            st.session_state.completed=False; st.session_state.usage="🏠 미래 주거시설"; st.session_state.shape="🏙️ 수직형 타워"; st.session_state.material="🧱 저탄소 콘크리트"; st.session_state.technologies=[]; st.session_state.building_color="#5D7F7A"; st.session_state.budget=100; st.session_state.page="USAGE"; st.rerun()
+            st.session_state.completed=False; st.session_state.usage="🏠 미래 주거시설"; st.session_state.shape="🏙️ 수직형 타워"; st.session_state.material="🧱 저탄소 콘크리트"; st.session_state.technologies=[]; st.session_state.building_color="#5D7F7A"; st.session_state.budget=100; st.session_state.page="HOME"; st.rerun()
