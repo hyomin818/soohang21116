@@ -568,7 +568,13 @@ with st.sidebar:
             st.session_state.page=page
             st.rerun()
 
-    st.page_link("pages/chat.py", label="💬 완성된 건물의 주민과 대화", icon="💬", use_container_width=True)
+    # page_link can stop the app at startup if pages/chat.py is missing in deployment.
+    # Move to the chat page only when the user clicks the button.
+    if st.button("💬 완성된 건물의 주민과 대화", key="go_resident_chat", use_container_width=True):
+        try:
+            st.switch_page("pages/chat.py")
+        except Exception:
+            st.error("주민 대화 페이지를 찾을 수 없습니다. GitHub 저장소에 pages/chat.py 경로로 파일을 올렸는지 확인해 주세요.")
     st.divider()
     cost = design_cost()
     remain = remaining_budget()
