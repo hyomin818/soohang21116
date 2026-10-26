@@ -1,4 +1,5 @@
 import streamlit as st
+import random
 
 st.set_page_config(
     page_title="2050 FUTURE ARCHITECT",
@@ -73,6 +74,9 @@ st.session_state.setdefault("material", "🧱 저탄소 콘크리트")
 st.session_state.setdefault("technologies", [])
 st.session_state.setdefault("building_color", "#5D7F7A")
 st.session_state.setdefault("budget", 100)
+st.session_state.setdefault("commission_usage", None)
+st.session_state.setdefault("commission_shape", None)
+st.session_state.setdefault("commission_active", False)
 
 # =========================================================
 # 설계 데이터
@@ -240,9 +244,9 @@ def pollution_score():
     reduction = abs(USAGES[st.session_state.usage]["impact"])
     reduction += abs(SHAPES[st.session_state.shape]["impact"])
     reduction += abs(MATERIALS[st.session_state.material]["impact"])
-    # 미래 기술은 건물 운영 중의 환경 부담을 지속적으로 줄이는 핵심 요소이므로
-    # 게임 안에서는 기술별 표시 영향값의 2배를 감축 점수로 반영합니다.
-    reduction += 2 * sum(abs(TECHNOLOGIES[tech]["impact"]) for tech in st.session_state.technologies)
+    # 게임 난이도 조정: 미래 기술의 오염 감축 효과를 3배로 반영해
+    # 용도와 형태가 어떤 조합으로 의뢰되더라도 예산 안에서 성공 조합을 만들 수 있게 합니다.
+    reduction += 3 * sum(abs(TECHNOLOGIES[tech]["impact"]) for tech in st.session_state.technologies)
     return max(0, 100 - reduction)
 
 def design_cost():
@@ -262,8 +266,20 @@ def budget_text(value):
     sign = "-" if value < 0 else ""
     return f"{sign}{abs(value):,}억원"
 
+def commission_matches():
+    if not st.session_state.commission_active:
+        return False
+    return (
+        st.session_state.usage == st.session_state.commission_usage
+        and st.session_state.shape == st.session_state.commission_shape
+    )
+
 def mission_success():
-    return pollution_score() <= 40 and remaining_budget() >= 0
+    return (
+        pollution_score() <= 40
+        and remaining_budget() >= 0
+        and commission_matches()
+    )
 
 # =========================================================
 # 3D 건축물 HTML
@@ -553,6 +569,13 @@ def effect_card(title, impact, effect, limit, cost=None):
 with st.sidebar:
     st.markdown("<div style='font:800 20px Orbitron;color:#fff;'>2050 // ARCHITECT</div>", unsafe_allow_html=True)
     st.markdown("<div style='color:#a9c0bc;font-size:13px;margin:6px 0 20px;'>ONE BUILDING / DESERT EARTH</div>", unsafe_allow_html=True)
+    if st.session_state.commission_active:
+        st.markdown("### 📄 현재 건축 의뢰")
+        st.caption("의뢰받은 용도와 형태를 지켜야 성공할 수 있습니다.")
+        st.markdown(f"**용도:** {st.session_state.commission_usage}")
+        st.markdown(f"**형태:** {st.session_state.commission_shape}")
+    else:
+        st.caption("HOME에서 의뢰를 받고 설계를 시작하세요.")
 
     nav = {
         "🏠 HOME":"HOME",
@@ -607,10 +630,12 @@ if st.session_state.page == "HOME":
         remain = remaining_budget()
         if mission_success():
             st.success(f"🌍 설계 성공! 오염지수 {score} · 남은 예산 {remain:,} — 여러 조합 중 하나로 조건을 만족했습니다.")
+        elif not commission_matches():
+            st.error("⚠️ 의뢰 조건 불일치 — 의뢰받은 용도와 형태를 지켜야 프로젝트를 성공시킬 수 있습니다.")
         elif remain < 0:
             st.error(f"⚠️ 예산 초과! 오염지수 {score} · {abs(remain):,}억원 초과 — 기술이나 자재 조합을 바꿔보세요.")
         else:
-            st.error(f"⚠️ 아직 조건을 만족하지 못했어요. 오염지수 {score} · 남은 예산 {remain:,} — 정답 하나가 아니라 다른 조합을 시도해보세요.")
+            st.error(f"⚠️ 아직 조건을 만족하지 못했어요. 오염지수 {score} · 남은 예산 {remain:,} — 기술과 자재 조합을 바꿔보세요.")
 
         c1,c2=st.columns(2)
         with c1:
@@ -619,11 +644,15 @@ if st.session_state.page == "HOME":
         with c2:
             if st.button("🔄 새로운 건축물 만들기", use_container_width=True):
                 st.session_state.completed=False
+                st.session_state.commission_active=False
+                st.session_state.commission_usage=None
+                st.session_state.commission_shape=None
                 st.session_state.usage="🏠 미래 주거시설"
                 st.session_state.shape="🏙️ 수직형 타워"
                 st.session_state.material="🧱 저탄소 콘크리트"
                 st.session_state.technologies=[]
                 st.session_state.building_color="#5D7F7A"
+                st.session_state.budget=100
                 st.session_state.page="HOME"; st.rerun()
     else:
         st.markdown("""
@@ -638,12 +667,30 @@ if st.session_state.page == "HOME":
         <div class="card" style="margin-top:18px;">
             <div class="effect-label">MISSION 2050</div>
             <h2 style="margin:7px 0 10px;">황량해진 지구에 단 하나의 건축물을 설계하라.</h2>
-            <div class="small-note">시작 시 예산은 100억원, 오염지수는 100입니다. 설계를 시작해 용도 → 형태 → 자재 → 미래 기술을 선택할 때마다 비용이 차감되고 오염지수가 내려갑니다. 선택할 때마다 건물 외관도 달라집니다. 완성 후 메인 화면에서 건물을 마우스로 드래그해 360°로 돌려볼 수 있습니다.</div>
+            <div class="small-note">의뢰를 받으면 건물 용도와 형태가 무작위로 정해집니다. 두 조건을 반드시 지켜야 하며, 시작 예산 100억원 안에서 자재와 미래 기술을 조합해 오염지수 40 이하를 달성하면 성공입니다. 기술의 감축 효과를 높여 다양한 조합으로 성공할 수 있도록 난이도를 조정했습니다. 완성 후 메인 화면에서 건물을 마우스로 드래그해 360°로 돌려볼 수 있습니다.</div>
         </div>
         """, unsafe_allow_html=True)
         st.markdown("")
-        if st.button("🚀 설계 시작하기", type="primary", use_container_width=True):
-            st.session_state.page="USAGE"; st.rerun()
+        st.markdown("""
+        <div class="expert-box">
+          <div class="expert-kicker">CLIENT COMMISSION</div>
+          <h3>건축 의뢰를 수락하세요</h3>
+          <p>의뢰인은 건물의 <b>용도와 형태</b>를 지정합니다. 두 조건을 반드시 지키고, 남은 예산 100억원 안에서 환경 부담을 줄여야 프로젝트를 성공시킬 수 있습니다.</p>
+        </div>
+        """, unsafe_allow_html=True)
+        if st.button("📩 무작위 건축 의뢰 받기", type="primary", use_container_width=True):
+            st.session_state.commission_usage = random.choice(list(USAGES.keys()))
+            st.session_state.commission_shape = random.choice(list(SHAPES.keys()))
+            st.session_state.commission_active = True
+            st.session_state.completed = False
+            st.session_state.usage = st.session_state.commission_usage
+            st.session_state.shape = st.session_state.commission_shape
+            st.session_state.material = "🧱 저탄소 콘크리트"
+            st.session_state.technologies = []
+            st.session_state.building_color = "#5D7F7A"
+            st.session_state.budget = 100
+            st.session_state.page = "USAGE"
+            st.rerun()
 
 # =========================================================
 # USAGE
@@ -651,14 +698,16 @@ if st.session_state.page == "HOME":
 elif st.session_state.page == "USAGE":
     st.markdown("<div class='hero-title' style='font-size:42px;'>01 / BUILDING USE</div>", unsafe_allow_html=True)
     st.markdown("<div class='hero-sub'>WHAT WILL YOUR BUILDING DO?</div>", unsafe_allow_html=True)
-    current_usage = st.session_state.usage
-    fixed_cost = SHAPES[st.session_state.shape]["cost"] + MATERIALS[st.session_state.material]["cost"] + sum(TECHNOLOGIES[t]["cost"] for t in st.session_state.technologies)
-    available_usages = [name for name, data in USAGES.items() if fixed_cost + data["cost"] <= st.session_state.budget or name == current_usage]
-    choice=st.radio("건축물의 용도를 선택하세요. (예산이 부족한 선택지는 목록에서 제외됩니다.)", available_usages, index=available_usages.index(current_usage), format_func=lambda x: f"{x} · {USAGES[x]['cost']}억원")
-    st.session_state.usage=choice
-    unavailable_usages = [name for name, data in USAGES.items() if fixed_cost + data["cost"] > st.session_state.budget and name != current_usage]
-    if unavailable_usages:
-        st.caption("예산 부족으로 선택 불가: " + " · ".join(f"{name} ({USAGES[name]['cost']}억원)" for name in unavailable_usages))
+    if not st.session_state.commission_active:
+        st.warning("먼저 HOME에서 건축 의뢰를 받아야 합니다.")
+        if st.button("HOME으로 돌아가기", use_container_width=True):
+            st.session_state.page = "HOME"
+            st.rerun()
+        st.stop()
+    choice = st.session_state.commission_usage
+    st.session_state.usage = choice
+    st.info("📄 의뢰 조건: **{}**. 의뢰인이 지정한 용도이므로 변경할 수 없습니다.".format(choice))
+    st.caption("의뢰된 용도 비용: {}억원".format(USAGES[choice]["cost"]))
     data=USAGES[choice]
     st.markdown(effect_card(choice,data["impact"],data["effect"],data["limit"], data.get("cost")), unsafe_allow_html=True)
     st.markdown("""<div class='expert-box'><div class='expert-kicker'>ARCHITECTURE NOTE</div><h3>건축물의 용도는 필요한 환경을 결정해요.</h3><p>같은 크기의 건물이라도 주거시설, 학교, 병원처럼 <b>무엇을 하는 공간인지</b>에 따라 필요한 빛, 온도, 공기, 물, 전력의 조건이 달라집니다.</p><p><b>쉽게 말하면</b> 건축가는 먼저 건물에서 어떤 활동이 일어나는지 정한 뒤, 그 활동에 맞춰 공간과 설비를 계획합니다. 이 게임의 점수는 이런 차이를 이해하기 위한 가상 값입니다.</p></div>""", unsafe_allow_html=True)
@@ -670,14 +719,16 @@ elif st.session_state.page == "USAGE":
 elif st.session_state.page == "SHAPE":
     st.markdown("<div class='hero-title' style='font-size:42px;'>02 / FORM</div>", unsafe_allow_html=True)
     st.markdown("<div class='hero-sub'>CHANGE THE ARCHITECTURE ITSELF.</div>", unsafe_allow_html=True)
-    current_shape = st.session_state.shape
-    fixed_cost = USAGES[st.session_state.usage]["cost"] + MATERIALS[st.session_state.material]["cost"] + sum(TECHNOLOGIES[t]["cost"] for t in st.session_state.technologies)
-    available_shapes = [name for name, data in SHAPES.items() if fixed_cost + data["cost"] <= st.session_state.budget or name == current_shape]
-    choice=st.radio("건축 형태를 선택하세요. (예산이 부족한 선택지는 목록에서 제외됩니다.)", available_shapes, index=available_shapes.index(current_shape), format_func=lambda x: f"{x} · {SHAPES[x]['cost']}억원")
-    st.session_state.shape=choice
-    unavailable_shapes = [name for name, data in SHAPES.items() if fixed_cost + data["cost"] > st.session_state.budget and name != current_shape]
-    if unavailable_shapes:
-        st.caption("예산 부족으로 선택 불가: " + " · ".join(f"{name} ({SHAPES[name]['cost']}억원)" for name in unavailable_shapes))
+    if not st.session_state.commission_active:
+        st.warning("먼저 HOME에서 건축 의뢰를 받아야 합니다.")
+        if st.button("HOME으로 돌아가기", use_container_width=True):
+            st.session_state.page = "HOME"
+            st.rerun()
+        st.stop()
+    choice = st.session_state.commission_shape
+    st.session_state.shape = choice
+    st.info("📄 의뢰 조건: **{}**. 의뢰인이 지정한 형태이므로 변경할 수 없습니다.".format(choice))
+    st.caption("의뢰된 형태 비용: {}억원".format(SHAPES[choice]["cost"]))
     show_building()
     data=SHAPES[choice]
     st.markdown(effect_card(choice,data["impact"],data["effect"],data["limit"], data.get("cost")), unsafe_allow_html=True)
