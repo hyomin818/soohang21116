@@ -6,10 +6,10 @@ st.set_page_config(page_title="2050 주민 대화", page_icon="💬", layout="wi
 
 # 선택된 건축 설계 정보는 메인 페이지의 session_state에서 읽습니다.
 USAGE_PEOPLE = {
-    "🏠 미래 주거시설": ["주민", "건물 관리인"],
-    "🏫 미래 학교": ["학생", "교사", "건물 관리인"],
-    "🏥 미래 병원": ["환자", "의사", "건물 관리인"],
-    "🔬 미래 연구센터": ["연구원", "건물 관리인"],
+    "🏠 미래 주거시설": ["40대 주민", "건물 관리인"],
+    "🏫 미래 학교": ["15세 학생", "30대 교사", "건물 관리인"],
+    "🏥 미래 병원": ["50대 의사", "환자", "건물 관리인"],
+    "🔬 미래 연구센터": ["20대 연구원", "건물 관리인"],
 }
 SHAPE_TEXT = {
     "🏙️ 수직형 타워": "높은 층에 살면 전망은 좋지만 엘리베이터를 기다리는 시간이 길게 느껴질 때가 있어요.",
@@ -32,12 +32,33 @@ TECH_TEXT = {
     "💧 빗물 이용": "빗물을 조경에 활용한다면 물을 아낀다는 점에서 괜찮은 것 같아요.",
     "🔄 물 재이용": "물을 아껴 쓰는 건 좋은데, 어떤 용도로 다시 쓰는지 안내가 잘 되어 있으면 더 안심될 것 같아요.",
 }
-COST = {
-    "🏠 미래 주거시설": 10, "🏫 미래 학교": 8, "🏥 미래 병원": 16, "🔬 미래 연구센터": 12,
-    "🏙️ 수직형 타워": 18, "🌿 테라스형": 15, "🌿 테라스형 건축": 15, "🛸 돔형": 22, "🛸 돔형 건축": 22,
-    "🌍 저층 생태형": 12, "🌍 반지하형": 12, "🌍 반지하형 건축": 12,
-    "🧱 저탄소 콘크리트": 12, "🔩 저탄소 철강": 18, "🌲 목재·바이오 기반": 24, "♻️ 재사용·재활용 재료": 20,
-    "☀️ 태양광 발전": 30, "🌬️ 자연환기": 15, "🪟 외부 차양": 10, "🌱 녹화 지붕": 18, "💧 빗물 이용": 7, "🔄 물 재이용": 15,
+USAGE_DATA = {
+    "🏠 미래 주거시설": {"cost": 10, "impact": 4},
+    "🏫 미래 학교": {"cost": 8, "impact": 2},
+    "🏥 미래 병원": {"cost": 16, "impact": 6},
+    "🔬 미래 연구센터": {"cost": 12, "impact": 3},
+}
+SHAPE_DATA = {
+    "🏙️ 수직형 타워": {"cost": 18, "impact": 7},
+    "🌿 테라스형": {"cost": 15, "impact": 3},
+    "🌿 테라스형 건축": {"cost": 15, "impact": 3},
+    "🛸 돔형": {"cost": 22, "impact": 2},
+    "🛸 돔형 건축": {"cost": 22, "impact": 2},
+    "🌍 저층 생태형": {"cost": 12, "impact": 1},
+}
+MATERIAL_DATA = {
+    "🧱 저탄소 콘크리트": {"cost": 12, "impact": 6},
+    "🔩 저탄소 철강": {"cost": 18, "impact": 5},
+    "🌲 목재·바이오 기반": {"cost": 24, "impact": 2},
+    "♻️ 재사용·재활용 재료": {"cost": 20, "impact": 0},
+}
+TECH_DATA = {
+    "☀️ 태양광 발전": {"cost": 30, "impact": -10},
+    "🌬️ 자연환기": {"cost": 15, "impact": -7},
+    "🪟 외부 차양": {"cost": 10, "impact": -6},
+    "🌱 녹화 지붕": {"cost": 18, "impact": -7},
+    "💧 빗물 이용": {"cost": 7, "impact": -5},
+    "🔄 물 재이용": {"cost": 15, "impact": -5},
 }
 COLORS = {
     "#5D7F7A": "미래형 민트", "#A77D5C": "사막 모래", "#C9D4D0": "화이트",
@@ -95,21 +116,26 @@ if not isinstance(techs, list):
 color = st.session_state.get("building_color", "#5D7F7A")
 people = USAGE_PEOPLE.get(usage, USAGE_PEOPLE["🏠 미래 주거시설"])
 
-def cost_of(value, fallback=0):
-    return COST.get(value, fallback)
+def lookup(data, value, default):
+    return data.get(value, default)
 
-design_cost = cost_of(usage, 10) + cost_of(shape, 18) + cost_of(material, 12)
-tech_cost = sum(cost_of(item, 0) for item in techs)
-total_cost = design_cost + tech_cost
 budget = st.session_state.get("budget", 100)
-remaining = budget - total_cost
-pollution = st.session_state.get("pollution_index", st.session_state.get("pollution", None))
-if pollution is None:
-    usage_add = 4 if "주거" in usage else 2 if "학교" in usage else 6 if "병원" in usage else 3
-    shape_add = 7 if "타워" in shape else 3 if "테라스" in shape else 2 if "돔" in shape else 1
-    material_add = 6 if "콘크리트" in material else 5 if "철강" in material else 2 if "목재" in material else 0
-    reductions = {"☀️ 태양광 발전": 10, "🌬️ 자연환기": 7, "🪟 외부 차양": 6, "🌱 녹화 지붕": 7, "💧 빗물 이용": 5, "🔄 물 재이용": 5}
-    pollution = max(0, min(100, 42 + usage_add + shape_add + material_add - sum(reductions.get(t, 0) for t in techs)))
+design_cost = (
+    lookup(USAGE_DATA, usage, {"cost": 10, "impact": 4})["cost"]
+    + lookup(SHAPE_DATA, shape, {"cost": 18, "impact": 7})["cost"]
+    + lookup(MATERIAL_DATA, material, {"cost": 12, "impact": 6})["cost"]
+    + sum(lookup(TECH_DATA, item, {"cost": 0, "impact": 0})["cost"] for item in techs)
+)
+remaining = budget - design_cost
+reduction = (
+    abs(lookup(USAGE_DATA, usage, {"cost": 10, "impact": 4})["impact"])
+    + abs(lookup(SHAPE_DATA, shape, {"cost": 18, "impact": 7})["impact"])
+    + abs(lookup(MATERIAL_DATA, material, {"cost": 12, "impact": 6})["impact"])
+    + 2 * sum(abs(lookup(TECH_DATA, item, {"cost": 0, "impact": 0})["impact"]) for item in techs)
+)
+pollution = max(0, 100 - reduction)
+# This mirrors main.py: the building is ready only at pollution <= 40 and within budget.
+mission_ready = pollution <= 40 and remaining >= 0
 
 # Reset old messages if the building design has changed.
 signature = (usage, shape, material, tuple(techs), color, total_cost, pollution)
@@ -119,26 +145,48 @@ if st.session_state.get("resident_chat_signature") != signature:
     st.session_state["resident_chat_character"] = None
 
 def first_message(person):
+    air_low = pollution <= 35
+    air_mid = 35 < pollution <= 65
     if person == "건물 관리인":
-        tech_names = ", ".join(techs) if techs else "선택된 미래 기술 없음"
-        return "안녕하세요. 건물 관리인입니다. 현재 설계 비용은 {}억원이고 남은 예산은 {}억원입니다. 선택된 기술은 {}입니다. 설비 유지관리나 운영비 관련 질문에 답변드리겠습니다.".format(total_cost, remaining, tech_names)
-    if person == "학생":
-        return random.choice([
-            "나 여기 다니는 학생이야! 쉬는 시간에 편하게 앉아 있을 데가 있는지가 은근 중요해. 학교에서 지내는 느낌 궁금한 거 있어?",
-            "안녕! 학교 건물은 수업 시간 말고 쉬는 시간에도 오래 있잖아. 햇빛이나 소리, 친구들이랑 머물 공간 같은 얘기 해줄게."
-        ])
-    if person == "교사":
-        return "안녕하세요. 이 학교에서 학생들을 가르치고 있어요. 수업할 때나 쉬는 시간에 실제로 느끼는 점을 솔직하게 말씀드릴게요."
+        return "안녕하세요. 건물 관리인입니다. 설계 비용은 {}억원, 남은 예산은 {}억원이며 현재 게임 오염지수는 {}/100입니다. 운영과 유지관리 관련 문의에 답변하겠습니다.".format(design_cost, remaining, pollution)
+
+    if person == "40대 주민":
+        if pollution > 65:
+            return "아이고, 건물은 새로 지었다는데 공기가 왜 이래요? 창문 열기도 겁나고 집에 있어도 목이 답답한 느낌이라니까요. 설계하신 분 맞죠? 이런 상태를 어떻게 해결할 건지 좀 듣고 싶네요."
+        if pollution > 35:
+            return "안녕하세요. 여기 사는 주민이에요. 뭐, 겉보기엔 괜찮은데 공기가 늘 상쾌한 건 아니네요. 환기 잘 되는 날은 그나마 낫고요. 살아보는 사람 입장에서 이것저것 물어볼게요."
+        return "아이고, 이제야 좀 살 만하네요. 공기가 전보다 한결 쾌적해서 아침에 잠깐 산책하기도 괜찮아요. 그래도 살아보면 자잘한 불편은 꼭 생기거든요. 제가 솔직하게 얘기해 드릴 테니 잘 들어봐요."
+    if person == "15세 학생":
+        if pollution > 65:
+            return "헐, 여기 공기 너무 답답한데요? 체육하고 들어오면 숨이 더 막히는 느낌이라 진짜 불편해요. 친구들도 창문 열자고 했다가 바깥 공기 때문에 망설여요. 학교가 이래도 되는 거예요?"
+        if pollution > 35:
+            return "안녕하세요! 학교는 재밌는데 가끔 교실 공기가 답답해요. 쉬는 시간에 밖에 나가고 싶어도 공기 상태를 먼저 보게 되더라고요. 그래도 좋은 점도 있으니까 궁금한 거 물어보세요!"
+        return "안녕하세요! 저 여기 다니는 학생이에요. 요즘은 교실 공기도 괜찮고 쉬는 시간에 친구들이랑 지내기도 좋아요! 근데 건물에 대해 궁금한 거 말고도 그냥 편하게 얘기해도 돼요."
+    if person == "30대 교사":
+        if pollution > 65:
+            return "안녕하세요. 이 학교에서 학생들을 가르치고 있습니다. 솔직히 지금 공기 상태는 많이 우려스럽습니다. 아이들이 수업 중에도 답답하다고 하고, 건강에 영향을 주지 않을까 걱정이 큽니다. 학생들이 안심하고 지낼 수 있는 환경부터 마련해야 합니다."
+        if pollution > 35:
+            return "안녕하세요. 학생들을 가르치는 교사입니다. 아주 나쁘다고만 할 수는 없지만, 공기가 답답하다고 호소하는 학생들이 있어 마음이 쓰입니다. 수업에 집중할 수 있도록 환기와 실내 환경을 더 세심하게 살펴야겠어요."
+        return "안녕하세요. 이 학교에서 학생들을 가르치고 있어요. 공기가 쾌적하니 아이들도 한결 편안해 보이고 수업 분위기도 좋아졌습니다. 그래도 학생들 입장에서 불편한 건 없는지 계속 살펴보려고 해요."
+    if person == "50대 의사":
+        if pollution > 65:
+            return "안녕하십니까. 병원에서 진료하는 의사입니다. 현재와 같은 공기 환경은 환자와 의료진이 머무는 공간으로 적절하다고 보기 어렵습니다. 특히 호흡기 질환이 있는 환자에게는 더욱 세심한 환경 관리가 필요합니다. 이 상태를 개선할 계획이 있는지 묻고 싶습니다."
+        if pollution > 35:
+            return "안녕하세요. 이 병원에서 진료하고 있습니다. 현재 환경이 전적으로 나쁘다고 단정할 수는 없지만, 공기 상태가 안정적이라고 보기도 어렵습니다. 환자가 오래 머무는 공간인 만큼 더 세밀한 관리가 필요하겠습니다."
+        return "안녕하세요. 이 병원에서 진료하는 의사입니다. 공기가 쾌적하면 환자분들이 대기하는 동안 느끼는 부담도 줄어들 수 있겠지요. 물론 실제 의료 환경은 지속적인 측정과 관리가 중요합니다. 편하게 질문하십시오."
     if person == "환자":
-        return "안녕하세요. 진료를 받으러 왔다가 대기하는 시간이 길어졌어요. 아플 때는 눈부심이나 소음도 신경 쓰이더라고요. 환자 입장에서 느낀 점을 이야기해 볼게요."
-    if person == "의사":
-        return "안녕하세요. 이 병원에서 일하는 의사입니다. 환자들이 기다릴 때 편안한지, 직원들이 이동하기에 괜찮은지 실제 사용 경험을 말씀드릴게요."
-    if person == "연구원":
-        return "안녕하세요! 여기서 연구하는 사람입니다. 하루 종일 집중하다 보면 빛이나 온도, 잠깐 쉴 공간이 중요하더라고요. 직접 지내며 느낀 점을 알려드릴게요."
-    return random.choice([
-        "안녕하세요! 여기 사는 주민이에요. 도면으로 볼 때랑 직접 살아볼 때는 또 다르더라고요. 좋은 점도 아쉬운 점도 편하게 물어봐요.",
-        "안녕! 여기 살면서 느낀 점을 솔직하게 얘기해 줄게요. 멋진 외관도 좋지만, 매일 지내기 편한지가 제일 중요하더라고요."
-    ])
+        if pollution > 65:
+            return "저 환자인데요, 아픈 것도 힘든데 여기 공기까지 답답하니까 걱정돼요. 대기실에 오래 앉아 있기가 불편하고 괜히 제 건강에도 안 좋을까 신경 쓰여요. 환자가 안심하고 있을 수 있는 곳이면 좋겠어요."
+        if pollution > 35:
+            return "안녕하세요. 진료 기다리는 중이에요. 심하게 불편한 건 아니지만 사람이 많을 때는 공기가 좀 답답하게 느껴져요. 몸이 안 좋을 때는 이런 것도 더 신경 쓰이더라고요."
+        return "안녕하세요. 진료받으러 왔어요. 대기하는 동안 공기가 쾌적해서 그나마 마음이 편하네요. 병원은 아픈 사람들이 오는 곳이니까 이런 환경이 은근 중요하다고 생각해요."
+    if person == "20대 연구원":
+        if pollution > 65:
+            return "저는 연구센터에서 일하는 연구원입니다. 현재 공기 환경은 연구 집중도를 유지하기에 적절하지 않습니다. 환기와 실험 환경이 불안정하면 데이터의 신뢰도에도 영향을 줄 수 있어요. 이 상태가 계속되면 연구 일정 자체가 흔들릴 수 있습니다."
+        if pollution > 35:
+            return "안녕하세요. 연구센터에서 일하고 있습니다. 업무를 못 할 정도는 아니지만, 공기 상태가 들쑥날쑥하면 집중하기 어렵습니다. 연구 공간은 일정한 환경을 유지하는 게 중요하니 개선이 필요해 보입니다."
+        return "안녕하세요. 연구센터에서 일하는 연구원입니다. 공기가 쾌적하니 오래 집중해도 피로감이 덜한 편입니다. 물론 연구 환경은 작은 변화도 영향을 줄 수 있으니 계속 점검해야 합니다. 다른 얘기도 괜찮으니 편하게 물어보세요."
+    return "안녕하세요. 현재 설계와 운영 상태를 확인하고 있습니다. 설비 유지관리나 예산, 오염지수에 관해 궁금한 점이 있으면 말씀해 주세요."
 
 def generate_natural_reply(message, person):
     """Use Gemini for open-ended, context-aware resident conversation when an API key is configured."""
@@ -161,7 +209,7 @@ def generate_natural_reply(message, person):
         air_context = "오염지수가 높아 주민은 공기가 탁하고 목이 칼칼하거나 오래 바깥에 있기 불편하다고 느낄 수 있다. 극단적인 공포를 조장하지 말고, 건물 안에서도 환기와 공기 정화가 중요하다고 말한다."
 
     system_prompt = f"""
-너는 2050년에 완성된 건물에서 실제로 생활하는 '{person}'이다. 사용자와 자연스럽게 한국어로 대화한다.
+너는 2050년에 완성된 건물의 '{person}' 캐릭터다. 설정된 나이와 성격을 일관되게 유지하며 실제 사람처럼 자연스러운 한국어 대화를 한다.
 이 사용자는 건축가이며 건축 자재와 설계의 전문 설명을 이미 잘 알고 있다. 그러므로 자재 사전을 읽듯 설명하거나 건축가를 가르치려 들지 말고, 실제 거주자의 후기, 생활 속 감정, 불편함, 작은 에피소드를 중심으로 말한다.
 사용자가 건물과 무관한 일상 이야기나 전혀 다른 주제를 꺼내도 그 말에 자연스럽게 반응하고 대화를 이어간다. 매번 건축 이야기로 억지로 되돌리지 않는다. 너무 형식적인 문장, 같은 문구 반복, 보고서 말투, 목록식 답변을 피한다. 보통 2~5문장 정도로 말하고, 대화체를 사용한다.
 건물 용도: {usage_label}
@@ -176,6 +224,14 @@ def generate_natural_reply(message, person):
 건물 형태의 생활 체감: {SHAPE_TEXT.get(shape, "")}
 자재의 생활 체감: {MATERIAL_TEXT.get(material, "")}
 선택 기술의 생활 체감: {" ".join(TECH_TEXT[t] for t in techs if t in TECH_TEXT) or "특별히 선택한 미래 기술이 없음"}
+캐릭터 설정:
+- 40대 주민: 생활 경험이 많고 말끝에 "아이고", "그러니까요", "이게 참" 같은 표현을 자연스럽게 쓰는 약간 투덜대는 동네 주민. 오염지수가 높으면 답답함과 불만을 자주 드러내며 설계자에게 개선을 요구한다. 오염지수가 낮으면 기분이 풀리고 일상 수다도 잘 한다.
+- 15세 학생: 활발하고 명랑한 학생 말투. 친구, 수업, 급식, 게임, 영화 등 다양한 주제에 관심을 보인다. 오염지수가 높으면 숨쉬기 불편하고 학교생활이 힘들다고 솔직하게 말한다.
+- 30대 교사: 따뜻하고 친근하지만 학생들을 책임지는 어른. 오염지수가 높으면 답답함을 느끼고 학생들의 건강과 수업 환경을 진지하게 걱정하며 조금 짜증 섞인 우려를 표현한다.
+- 50대 의사: 점잖고 지식적인 말투. 오염지수가 높으면 환자와 의료진이 머물기 적합하지 않은 환경이라고 단호하게 지적한다. 실제 의학적 진단이나 확정적인 건강 피해를 단정하지 않는다.
+- 환자: 몸이 좋지 않아 자신의 건강과 병원 환경을 걱정한다. 오염지수가 높으면 불안과 불편을 솔직히 표현하고, 낮으면 한결 안심한다.
+- 20대 연구원: 단호하고 엄격하며 근거와 연구 집중도를 중시한다. 오염지수가 높으면 실험 환경, 자료 신뢰도, 연구 일정이 흔들릴까 걱정한다.
+각 캐릭터는 영화, 음식, 취미, 날씨, 고민 등 건물과 관계없는 질문에도 해당 인물의 성격대로 답한다. 예를 들어 영화 질문에는 본인의 취향이나 감상을 말하고, "뭐 먹고 싶어?"에는 실제 대화처럼 음식 취향을 이야기한다. 모든 답을 건물 이야기로 돌리지 않는다. 낮은 오염지수일수록 말투가 여유롭고 일상 대화가 활발하다. 높은 오염지수에서는 캐릭터의 역할에 맞게 불만·걱정·비판을 대화 중 자연스럽게 드러낸다.
 대화 상대가 건물 관리인이면 설비, 예산, 유지관리 질문에 정확하고 조금 더 체계적으로 답한다. 그 외 인물은 비용 산정이나 자재의 기술적 특성을 전문가처럼 강의하지 말고 자기 경험을 말한다.
 예산이 부족하거나 남은 예산이 적다는 사실은 질문이 비용/설계/생활에 관련될 때 자연스럽게 반영한다. 주민은 예산을 정확히 알지 못할 수 있으므로, 사용자가 직접 묻지 않는 한 숫자를 줄줄 말하지 않는다.
 오염지수가 낮으면 쾌적함, 산책하기 편함, 창문을 열기 편함 등을 경험으로 표현할 수 있다. 오염지수가 높으면 공기가 탁함, 먼지, 답답함, 목이 칼칼한 느낌, 창문을 열기 망설여짐 등을 자연스럽게 언급한다. 이는 게임 속 설정이며 실제 건강 진단처럼 말하지 않는다.
@@ -207,7 +263,7 @@ def reply_to(message, person):
     q = message.lower()
     if person == "건물 관리인":
         if any(word in q for word in ["예산", "비용", "가격", "돈", "얼마"]):
-            return "현재 총비용은 {}억원이며 남은 예산은 {}억원입니다. 용도 {}억원, 형태 {}억원, 자재 {}억원, 미래 기술 {}억원으로 계산했습니다.".format(total_cost, remaining, cost_of(usage, 10), cost_of(shape, 18), cost_of(material, 12), tech_cost)
+            return "현재 총비용은 {}억원이며 남은 예산은 {}억원입니다. 용도 {}억원, 형태 {}억원, 자재 {}억원, 미래 기술 {}억원으로 계산했습니다.".format(total_cost, remaining, lookup(USAGE_DATA, usage, {"cost": 10, "impact": 4})["cost"], lookup(SHAPE_DATA, shape, {"cost": 18, "impact": 7})["cost"], lookup(MATERIAL_DATA, material, {"cost": 12, "impact": 6})["cost"], tech_cost)
         if any(word in q for word in ["기술", "설비", "유지", "관리", "고장", "운영"]):
             details = " ".join(TECH_TEXT[t] for t in techs if t in TECH_TEXT)
             if not details:
@@ -272,8 +328,28 @@ def reply_to(message, person):
         "사람마다 다르겠지만 편안함이 제일 중요해. 생활하면서 어떤 상황이 궁금한지 더 구체적으로 물어봐!"
     ])
 
+if not mission_ready:
+    st.title("🔒 입주 보류 — 주민 대화 잠금")
+    st.warning(
+        "아직 건물 완성 조건을 만족하지 못해 주민들이 입주하지 않았습니다. "
+        "게임 규칙상 오염지수 40 이하이면서 예산을 초과하지 않아야 대화를 시작할 수 있습니다."
+    )
+    col1, col2 = st.columns(2)
+    with col1:
+        st.metric("현재 오염지수", "{}/100".format(pollution), delta="목표: 40 이하")
+    with col2:
+        st.metric("남은 예산", "{}억원".format(remaining), delta="예산 초과" if remaining < 0 else "예산 범위 내")
+    st.info("메인 페이지로 돌아가 미래 기술과 자재를 다시 조합한 뒤, 설계 성공 조건을 달성해 주세요.")
+    if st.button("🏗️ 메인 설계로 돌아가기", use_container_width=True):
+        try:
+            st.switch_page("main.py")
+        except Exception:
+            st.session_state["page"] = "HOME"
+            st.rerun()
+    st.stop()
+
 st.title("💬 완성된 건물, 실제로 살아보면?")
-st.write("건축 설명보다 이 건물을 매일 이용하는 사람들의 생활 후기와 불편한 점을 들어보세요.")
+st.write("이제 입주가 시작됐어요. 건물 평가도 듣고, 영화나 음식 같은 딴 얘기도 편하게 나눠 보세요.")
 try:
     has_gemini_key = bool(st.secrets.get("GEMINI_API_KEY") or st.secrets.get("GOOGLE_API_KEY"))
 except Exception:
@@ -321,11 +397,11 @@ if prompt:
 
 st.markdown("### 💡 이렇게 물어봐도 좋아요")
 sample_questions = [
-    "여기서 살면서 제일 마음에 드는 점은 뭐야?",
-    "실제로 불편한 점은 없어?",
-    "여름에 덥거나 눈부시진 않아?",
-    "공기가 답답하거나 시끄럽진 않아?",
-    "내가 고른 기술이 생활에 도움이 돼?",
+    "여기 지내보니까 어때? 솔직하게 말해줘.",
+    "오염지수 때문에 불편한 건 없어?",
+    "요즘 무슨 영화가 재밌어?",
+    "지금 뭐 먹고 싶어?",
+    "이 건물에서 제일 고쳐줬으면 하는 건 뭐야?",
 ]
 columns = st.columns(5)
 for index, question in enumerate(sample_questions):
