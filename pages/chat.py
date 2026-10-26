@@ -1,5 +1,6 @@
 import streamlit as st
 import random
+import requests
 
 st.set_page_config(page_title="2050 주민 대화", page_icon="💬", layout="wide")
 
@@ -139,6 +140,69 @@ def first_message(person):
         "안녕! 여기 살면서 느낀 점을 솔직하게 얘기해 줄게요. 멋진 외관도 좋지만, 매일 지내기 편한지가 제일 중요하더라고요."
     ])
 
+def generate_natural_reply(message, person):
+    """Use Gemini for open-ended, context-aware resident conversation when an API key is configured."""
+    api_key = None
+    try:
+        api_key = st.secrets.get("GEMINI_API_KEY") or st.secrets.get("GOOGLE_API_KEY")
+    except Exception:
+        api_key = None
+
+    if not api_key:
+        return None
+
+    usage_label = usage
+    pollution_level = "낮음" if pollution <= 35 else "보통" if pollution <= 65 else "높음"
+    if pollution <= 35:
+        air_context = "오염지수가 낮아 주민은 공기가 비교적 쾌적하고 바깥 활동이 편하다고 느낄 수 있다. 단, 과장된 의학적 주장은 하지 않는다."
+    elif pollution <= 65:
+        air_context = "오염지수가 중간 정도라 주민은 날이나 시간대에 따라 공기가 괜찮기도 하고 답답하기도 하다고 말할 수 있다."
+    else:
+        air_context = "오염지수가 높아 주민은 공기가 탁하고 목이 칼칼하거나 오래 바깥에 있기 불편하다고 느낄 수 있다. 극단적인 공포를 조장하지 말고, 건물 안에서도 환기와 공기 정화가 중요하다고 말한다."
+
+    system_prompt = f"""
+너는 2050년에 완성된 건물에서 실제로 생활하는 '{person}'이다. 사용자와 자연스럽게 한국어로 대화한다.
+이 사용자는 건축가이며 건축 자재와 설계의 전문 설명을 이미 잘 알고 있다. 그러므로 자재 사전을 읽듯 설명하거나 건축가를 가르치려 들지 말고, 실제 거주자의 후기, 생활 속 감정, 불편함, 작은 에피소드를 중심으로 말한다.
+사용자가 건물과 무관한 일상 이야기나 전혀 다른 주제를 꺼내도 그 말에 자연스럽게 반응하고 대화를 이어간다. 매번 건축 이야기로 억지로 되돌리지 않는다. 너무 형식적인 문장, 같은 문구 반복, 보고서 말투, 목록식 답변을 피한다. 보통 2~5문장 정도로 말하고, 대화체를 사용한다.
+건물 용도: {usage_label}
+건물 형태: {shape}
+선택 자재: {material}
+선택 미래 기술: {", ".join(techs) if techs else "선택한 미래 기술 없음"}
+외관 색상: {COLORS.get(color, color)}
+현재 설계 총비용: {total_cost}억원 / 초기 예산 {budget}억원
+남은 예산: {remaining}억원
+게임 오염지수: {pollution}/100 ({pollution_level})
+환경 체감 지침: {air_context}
+건물 형태의 생활 체감: {SHAPE_TEXT.get(shape, "")}
+자재의 생활 체감: {MATERIAL_TEXT.get(material, "")}
+선택 기술의 생활 체감: {" ".join(TECH_TEXT[t] for t in techs if t in TECH_TEXT) or "특별히 선택한 미래 기술이 없음"}
+대화 상대가 건물 관리인이면 설비, 예산, 유지관리 질문에 정확하고 조금 더 체계적으로 답한다. 그 외 인물은 비용 산정이나 자재의 기술적 특성을 전문가처럼 강의하지 말고 자기 경험을 말한다.
+예산이 부족하거나 남은 예산이 적다는 사실은 질문이 비용/설계/생활에 관련될 때 자연스럽게 반영한다. 주민은 예산을 정확히 알지 못할 수 있으므로, 사용자가 직접 묻지 않는 한 숫자를 줄줄 말하지 않는다.
+오염지수가 낮으면 쾌적함, 산책하기 편함, 창문을 열기 편함 등을 경험으로 표현할 수 있다. 오염지수가 높으면 공기가 탁함, 먼지, 답답함, 목이 칼칼한 느낌, 창문을 열기 망설여짐 등을 자연스럽게 언급한다. 이는 게임 속 설정이며 실제 건강 진단처럼 말하지 않는다.
+선택한 기술의 영향도 주민 경험에 반영한다. 자연환기면 날씨가 좋을 때 환기, 차양이면 눈부심/더위 감소, 태양광이면 공용 전기 사용에 대한 체감, 녹화 지붕이면 초록 풍경과 열감, 빗물/물 재이용이면 물 절약에 대한 경험을 말한다.
+학생/교사/환자/의사/연구원/주민 등 역할에 맞는 말투를 유지한다. 이모지는 과하게 쓰지 않는다.
+사용자 메시지에 답만 하고 끝내지 말고, 필요하면 실제 사람처럼 짧은 맞장구나 자연스러운 되물음을 하나 곁들인다. 모르는 사실을 아는 척하지 않는다.
+"""
+    url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent"
+    payload = {
+        "system_instruction": {"parts": [{"text": system_prompt}]},
+        "contents": [{"role": "user", "parts": [{"text": message}]}],
+        "generationConfig": {"temperature": 0.9, "maxOutputTokens": 350}
+    }
+    try:
+        response = requests.post(
+            url,
+            params={"key": api_key},
+            json=payload,
+            timeout=20
+        )
+        response.raise_for_status()
+        data = response.json()
+        return data["candidates"][0]["content"]["parts"][0]["text"].strip()
+    except Exception:
+        return None
+
+
 def reply_to(message, person):
     q = message.lower()
     if person == "건물 관리인":
@@ -210,6 +274,12 @@ def reply_to(message, person):
 
 st.title("💬 완성된 건물, 실제로 살아보면?")
 st.write("건축 설명보다 이 건물을 매일 이용하는 사람들의 생활 후기와 불편한 점을 들어보세요.")
+try:
+    has_gemini_key = bool(st.secrets.get("GEMINI_API_KEY") or st.secrets.get("GOOGLE_API_KEY"))
+except Exception:
+    has_gemini_key = False
+if not has_gemini_key:
+    st.info("자유로운 주제에도 자연스럽게 답하는 대화를 사용하려면 Streamlit Cloud의 Settings → Secrets에 GEMINI_API_KEY를 추가해 주세요. 키가 없으면 기본 대화 규칙으로 응답합니다.")
 
 with st.sidebar:
     st.subheader("🏗️ 현재 설계")
@@ -245,7 +315,8 @@ for message in history:
 prompt = st.chat_input("{}에게 생활 후기를 물어보세요…".format(selected_person))
 if prompt:
     history.append({"role": "user", "content": prompt})
-    history.append({"role": "assistant", "content": reply_to(prompt, selected_person)})
+    ai_reply = generate_natural_reply(prompt, selected_person)
+    history.append({"role": "assistant", "content": ai_reply or reply_to(prompt, selected_person)})
     st.rerun()
 
 st.markdown("### 💡 이렇게 물어봐도 좋아요")
@@ -261,5 +332,6 @@ for index, question in enumerate(sample_questions):
     with columns[index]:
         if st.button(question, key="sample_question_{}".format(index), use_container_width=True):
             history.append({"role": "user", "content": question})
-            history.append({"role": "assistant", "content": reply_to(question, selected_person)})
+            ai_reply = generate_natural_reply(question, selected_person)
+            history.append({"role": "assistant", "content": ai_reply or reply_to(question, selected_person)})
             st.rerun()
