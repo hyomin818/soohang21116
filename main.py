@@ -150,77 +150,77 @@ SHAPES = {
 
 MATERIALS = {
     "🧱 저탄소 콘크리트": {
-        "impact": 6,
-        "effect": "콘크리트의 생산 단계에서 발생하는 탄소 영향을 줄이는 방향의 재료로 설정했습니다.",
+        "impact": -10,
+        "effect": "재료 생산 단계의 탄소 부담을 낮추는 자재로 설정했습니다. 오염지수를 10 낮춥니다.",
         "limit": "저탄소라고 해서 환경 영향이 0이 되는 것은 아니며 실제 성능은 생산 방식과 배합 등에 따라 달라집니다.",
         "class": "concrete",
-        "cost": 12,
-    },
-    "🔩 저탄소 철강": {
-        "impact": 5,
-        "effect": "철강 생산 과정의 탄소 영향을 낮추는 방향의 재료로 설정했습니다. 철골 구조의 장점을 유지하면서 환경 부담을 줄이는 선택입니다.",
-        "limit": "실제 탄소 영향은 생산 전력과 제조 방식 등에 따라 달라집니다.",
-        "class": "steel",
         "cost": 18,
     },
+    "🔩 저탄소 철강": {
+        "impact": -16,
+        "effect": "철강 생산 과정의 탄소 부담을 더 크게 낮추는 자재로 설정했습니다. 오염지수를 16 낮춥니다.",
+        "limit": "실제 탄소 영향은 생산 전력과 제조 방식 등에 따라 달라집니다.",
+        "class": "steel",
+        "cost": 25,
+    },
     "🌲 목재·바이오 기반": {
-        "impact": 2,
-        "effect": "목재와 바이오 기반 재료를 활용하는 선택으로, 재료 생산 단계의 환경 부담을 낮추는 방향으로 반영했습니다.",
+        "impact": -23,
+        "effect": "목재와 바이오 기반 재료를 활용해 재료 생산 단계의 부담을 줄이는 선택입니다. 오염지수를 23 낮춥니다.",
         "limit": "산림 관리, 생산 과정, 운송과 수명까지 함께 살펴야 합니다.",
         "class": "wood",
-        "cost": 24,
+        "cost": 32,
     },
     "♻️ 재사용·재활용 재료": {
-        "impact": 0,
-        "effect": "기존 자원을 다시 활용해 새로운 재료 생산을 줄이는 자원순환 방식으로 설정했습니다.",
+        "impact": -27,
+        "effect": "기존 자원을 다시 활용해 새 재료 생산 부담을 크게 줄입니다. 오염지수를 27 낮춥니다.",
         "limit": "재사용 가능 여부와 품질, 운송 과정 등에 따라 실제 효과가 달라집니다.",
         "class": "recycled",
-        "cost": 20,
+        "cost": 38,
     },
 }
 
 TECHNOLOGIES = {
     "☀️ 태양광 발전": {
-        "impact": -10,
-        "effect": "건물에서 전기를 생산해 외부 전력 사용을 줄이는 방향의 효과를 게임에 반영합니다.",
+        "impact": -30,
+        "effect": "건물에서 전기를 생산해 외부 전력 사용을 크게 줄이는 기술입니다. 오염지수를 30 낮춥니다.",
         "limit": "발전량은 일사량, 설치면적, 방향과 효율 등에 따라 달라집니다.",
         "visual": "solar",
         "cost": 30,
     },
     "🌬️ 자연환기": {
-        "impact": -7,
-        "effect": "바람과 개구부를 이용해 실내 공기를 순환시키고 기계식 냉방·환기 의존을 줄이는 방향으로 반영합니다.",
+        "impact": -20,
+        "effect": "바람과 개구부를 이용해 실내 공기를 순환시키고 기계식 냉방·환기 의존을 줄입니다. 오염지수를 20 낮춥니다.",
         "limit": "외부 온도와 공기질, 바람 조건이 좋지 않은 때에는 다른 설비가 필요할 수 있습니다.",
         "visual": "vent",
-        "cost": 15,
+        "cost": 20,
     },
     "🪟 외부 차양": {
-        "impact": -6,
-        "effect": "강한 햇빛의 실내 유입을 조절해 냉방 부담을 낮추는 방향으로 반영합니다.",
+        "impact": -16,
+        "effect": "강한 햇빛의 실내 유입을 조절해 냉방 부담을 낮춥니다. 오염지수를 16 낮춥니다.",
         "limit": "차양의 위치와 방향을 잘못 설계하면 자연채광을 줄일 수도 있습니다.",
         "visual": "shade",
-        "cost": 10,
+        "cost": 15,
     },
     "🌱 녹화 지붕": {
-        "impact": -7,
-        "effect": "옥상에 식생을 적용해 열환경과 빗물 관리에 도움을 주는 요소로 반영합니다.",
+        "impact": -20,
+        "effect": "옥상 식생으로 건물의 열환경과 빗물 관리에 도움을 줍니다. 오염지수를 20 낮춥니다.",
         "limit": "구조 하중, 관리, 물 공급 등을 고려해야 합니다.",
         "visual": "greenroof",
-        "cost": 18,
+        "cost": 25,
     },
     "💧 빗물 이용": {
-        "impact": -5,
-        "effect": "빗물을 모아 조경이나 일부 용도에 활용해 수돗물 사용을 줄이는 방향으로 반영합니다.",
+        "impact": -12,
+        "effect": "빗물을 모아 조경이나 일부 용도에 활용해 수돗물 사용을 줄입니다. 오염지수를 12 낮춥니다.",
         "limit": "강수량과 저장시설 크기에 따라 이용 가능한 양이 달라집니다.",
         "visual": "rain",
-        "cost": 7,
+        "cost": 12,
     },
     "🔄 물 재이용": {
-        "impact": -5,
-        "effect": "사용한 물을 처리해 다시 이용함으로써 물 사용량을 줄이는 방향으로 반영합니다.",
+        "impact": -15,
+        "effect": "사용한 물을 처리해 다시 이용함으로써 물 사용량을 줄입니다. 오염지수를 15 낮춥니다.",
         "limit": "처리시설과 유지관리가 필요하며 모든 용도의 물을 같은 방식으로 재사용할 수 있는 것은 아닙니다.",
         "visual": "reuse",
-        "cost": 15,
+        "cost": 18,
     },
 }
 
@@ -237,17 +237,17 @@ COLORS = {
 # 점수
 # =========================================================
 def pollution_score():
-    # 게임 시작 화면은 반드시 100으로 시작합니다. 설계를 시작하면
-    # 선택한 용도·형태·자재·기술의 영향값만큼 지수를 차감합니다.
+    # 시작 화면은 100으로 고정. 설계 후에는 선택한 항목의 영향값을 합산합니다.
     if st.session_state.page == "HOME" and not st.session_state.completed:
         return 100
-    reduction = abs(USAGES[st.session_state.usage]["impact"])
-    reduction += abs(SHAPES[st.session_state.shape]["impact"])
-    reduction += abs(MATERIALS[st.session_state.material]["impact"])
-    # 게임 난이도 조정: 미래 기술의 오염 감축 효과를 3배로 반영해
-    # 용도와 형태가 어떤 조합으로 의뢰되더라도 예산 안에서 성공 조합을 만들 수 있게 합니다.
-    reduction += 3 * sum(abs(TECHNOLOGIES[tech]["impact"]) for tech in st.session_state.technologies)
-    return max(0, 100 - reduction)
+    score = 100
+    # 용도와 형태는 게임상 오염지수를 증가시키는 값(양수)입니다.
+    score += USAGES[st.session_state.usage]["impact"]
+    score += SHAPES[st.session_state.shape]["impact"]
+    # 자재와 미래 기술은 감축 효과를 음수로 표시합니다.
+    score += MATERIALS[st.session_state.material]["impact"]
+    score += sum(TECHNOLOGIES[tech]["impact"] for tech in st.session_state.technologies)
+    return max(0, min(100, score))
 
 def design_cost():
     # HOME 첫 화면에서는 아직 설계를 시작하지 않았으므로 예산을 100억원 그대로 보여줍니다.
@@ -276,7 +276,7 @@ def commission_matches():
 
 def mission_success():
     return (
-        pollution_score() <= 40
+        pollution_score() <= 55
         and remaining_budget() >= 0
         and commission_matches()
     )
@@ -543,13 +543,13 @@ def show_building():
 
 def effect_card(title, impact, effect, limit, cost=None):
     if impact < 0:
-        impact_text = f"▼ {abs(impact)}"
+        impact_text = f"🟢 오염지수 {abs(impact)} 감축"
         cls = "good"
     elif impact > 0:
-        impact_text = f"▲ {impact}"
+        impact_text = f"🔴 오염지수 {impact} 증가"
         cls = "bad"
     else:
-        impact_text = "● 0"
+        impact_text = "⚪ 오염지수 변화 없음"
         cls = "neutral"
     cost_html = f'<div class="cost-line">💰 설계 비용 <b>{cost:,}억원</b></div>' if cost is not None else ''
     return f"""
@@ -557,7 +557,7 @@ def effect_card(title, impact, effect, limit, cost=None):
     <div class="effect-title">{title}</div>
     {cost_html}
     <div class="effect-label">오염지수 영향</div>
-    <div class="{cls}" style="font-size:23px;margin:4px 0 10px;">{impact_text}</div>
+    <div class="{cls}" style="font-size:20px;font-weight:800;margin:4px 0 10px;">{impact_text}</div>
     <div class="effect-text"><b>효과</b> · {effect}</div>
     <div class="effect-text" style="margin-top:8px;color:#aebfbc;"><b>주의/한계</b> · {limit}</div>
 </div>
@@ -667,7 +667,7 @@ if st.session_state.page == "HOME":
         <div class="card" style="margin-top:18px;">
             <div class="effect-label">MISSION 2050</div>
             <h2 style="margin:7px 0 10px;">황량해진 지구에 단 하나의 건축물을 설계하라.</h2>
-            <div class="small-note">의뢰를 받으면 건물 용도와 형태가 무작위로 정해집니다. 두 조건을 반드시 지켜야 하며, 시작 예산 100억원 안에서 자재와 미래 기술을 조합해 오염지수 40 이하를 달성하면 성공입니다. 기술의 감축 효과를 높여 다양한 조합으로 성공할 수 있도록 난이도를 조정했습니다. 완성 후 메인 화면에서 건물을 마우스로 드래그해 360°로 돌려볼 수 있습니다.</div>
+            <div class="small-note">의뢰를 받으면 건물 용도와 형태가 무작위로 정해집니다. 두 조건을 반드시 지켜야 하며, 시작 예산 100억원 안에서 자재와 미래 기술을 조합해 오염지수 55 이하를 달성하면 성공입니다. 기술의 감축 효과를 높여 다양한 조합으로 성공할 수 있도록 난이도를 조정했습니다. 완성 후 메인 화면에서 건물을 마우스로 드래그해 360°로 돌려볼 수 있습니다.</div>
         </div>
         """, unsafe_allow_html=True)
         st.markdown("")
@@ -769,7 +769,7 @@ elif st.session_state.page == "TECH":
         other_selected_cost = sum(TECHNOLOGIES[t]["cost"] for t in old_technologies if t != tech)
         can_afford = was_selected or (base_cost + other_selected_cost + data["cost"] <= st.session_state.budget)
         checked = st.checkbox(
-            f"{tech}  ·  {data['cost']}억원  ·  오염지수 {data['impact']:+d}",
+            f"{tech}  ·  {data['cost']}억원  ·  🟢 오염지수 {abs(data['impact'])} 감축",
             value=was_selected,
             disabled=not can_afford,
             key=f"tech_{tech}"
