@@ -109,8 +109,8 @@ def building_figure():
     fig = go.Figure()
 
     # 황폐한 지구의 자연 지형: 평평한 바닥 대신 완만한 구릉과 건조한 대지
-    xs = [(-120 + i * 3.0) for i in range(81)]
-    ys = [(-120 + j * 3.0) for j in range(81)]
+    xs = [(-1000 + i * 25.0) for i in range(81)]
+    ys = [(-1000 + j * 25.0) for j in range(81)]
     X, Y, Z = [], [], []
     for y in ys:
         row = []
@@ -119,13 +119,14 @@ def building_figure():
             hill_b = .72 * math.exp(-(((x+11)/4.5)**2 + ((y-7)/6.0)**2))
             ridge = (.32 * math.sin(x*.42) * math.cos(y*.31)) * math.exp(-((x/55)**2 + (y/55)**2))
             crater = -.38 * math.exp(-(((x-8)/2.8)**2 + ((y+8)/3.0)**2))
-            row.append(max(-.35, .05 + hill_a + hill_b + ridge + crater))
+            distant = .018 * math.sin(x*.012) * math.cos(y*.01)
+            row.append(max(-.35, .05 + hill_a + hill_b + ridge + crater + distant))
         X.append(xs)
         Y.append(y)
         Z.append(row)
     fig.add_trace(go.Surface(
         x=X, y=Y, z=Z,
-        surfacecolor=[[((x+15)/30)*.35 + ((y+15)/30)*.18 for x in xs] for y in ys],
+        surfacecolor=[[0.32 + 0.08*math.sin(x*.01)*math.cos(y*.01) for x in xs] for y in ys],
         colorscale=[[0,"#66513e"],[.25,"#8a6d4d"],[.5,"#a58a62"],[.75,"#6f7955"],[1,"#9c8a69"]],
         cmin=0,cmax=1,showscale=False,opacity=1,
         lighting=dict(ambient=.72,diffuse=.72,specular=.08,roughness=.95),
@@ -329,16 +330,16 @@ def building_figure():
 
     # 화면 내 건물 크기를 키우고, 어떤 방향에서도 왜곡되지 않도록 고정 비율 사용.
     fig.update_layout(
-        height=720,margin=dict(l=0,r=0,t=0,b=0),
+        height=820,margin=dict(l=0,r=0,t=0,b=0),
         paper_bgcolor="#17232a",plot_bgcolor="#17232a",
         scene=dict(
-            xaxis=dict(visible=False,range=[-13,13]),
-            yaxis=dict(visible=False,range=[-13,14]),
-            zaxis=dict(visible=False,range=[0,19]),
+            xaxis=dict(visible=False,range=[-9.5,9.5]),
+            yaxis=dict(visible=False,range=[-9.5,10.5]),
+            zaxis=dict(visible=False,range=[0,18]),
             bgcolor="#17232a",
-            aspectmode="manual",aspectratio=dict(x=1.0,y=1.0,z=1.0),
-            camera=dict(eye=dict(x=1.55,y=1.55,z=1.05),projection=dict(type="orthographic")),
-            dragmode="orbit"
+            aspectmode="manual",aspectratio=dict(x=1.0,y=1.0,z=1.12),
+            camera=dict(eye=dict(x=1.45,y=1.45,z=1.0),center=dict(x=0,y=0,z=0),projection=dict(type="perspective")),
+            dragmode="turntable"
         ),
         showlegend=False
     )
