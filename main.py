@@ -86,7 +86,7 @@ def pollution_label(impact):
 
 def success_check():
     # 난이도를 아주 조금 높여 오염지수 85 이하 + 예산 이내일 때 성공합니다.
-    return st.session_state.commissioned and pollution_score() <= 85 and remaining_budget() >= 0
+    return st.session_state.commissioned and pollution_score() <= 40 and remaining_budget() >= 0
 
 def impact_sum():
     return (USAGES[st.session_state.usage]["impact"] + SHAPES[st.session_state.shape]["impact"] +
