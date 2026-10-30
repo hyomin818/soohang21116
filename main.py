@@ -109,15 +109,15 @@ def building_figure():
     fig = go.Figure()
 
     # 황폐한 지구의 자연 지형: 평평한 바닥 대신 완만한 구릉과 건조한 대지
-    xs = [(-15 + i * .75) for i in range(41)]
-    ys = [(-15 + j * .75) for j in range(41)]
+    xs = [(-120 + i * 3.0) for i in range(81)]
+    ys = [(-120 + j * 3.0) for j in range(81)]
     X, Y, Z = [], [], []
     for y in ys:
         row = []
         for x in xs:
             hill_a = 1.15 * math.exp(-(((x-10)/5.5)**2 + ((y-9)/5.0)**2))
             hill_b = .72 * math.exp(-(((x+11)/4.5)**2 + ((y-7)/6.0)**2))
-            ridge = .32 * math.sin(x*.42) * math.cos(y*.31)
+            ridge = (.32 * math.sin(x*.42) * math.cos(y*.31)) * math.exp(-((x/55)**2 + (y/55)**2))
             crater = -.38 * math.exp(-(((x-8)/2.8)**2 + ((y+8)/3.0)**2))
             row.append(max(-.35, .05 + hill_a + hill_b + ridge + crater))
         X.append(xs)
@@ -399,7 +399,7 @@ if st.session_state.page == "메인 화면":
         a.metric("남은 예산",f"{remaining_budget()}억")
         b.metric("오염지수",f"{pollution_score()}/100",delta=f"{pollution_score()-100:+d} 지수",delta_color="inverse")
         c.metric("성공 목표","85 이하")
-        st.info("게임 성공 조건: 의뢰받은 건물을 그대로 유지하고, 예산을 초과하지 않으며, 오염지수 85 이하를 달성하세요. 선택 조합에 따라 성공할 수 있습니다.")
+        st.info("게임 성공 조건: 의뢰받은 건물을 그대로 유지하고, 예산을 초과하지 않으며, 미래 기술은 최대 3개까지 선택할 수 있으며, 적절한 친환경 자재와 기술 조합으로 오염지수 85 이하를 달성할 수 있습니다.")
 
 elif st.session_state.page == "건물 용도":
     st.title("🏢 건물 용도")
@@ -448,7 +448,8 @@ elif st.session_state.page == "미래 기술":
     if not st.session_state.commissioned:
         st.warning("먼저 메인 화면에서 건축 의뢰를 받아 주세요.")
     else:
-        st.write("필요한 기술을 여러 개 조합할 수 있습니다. 예산을 초과하는 기술은 선택할 수 없습니다.")
+        st.write("미래 기술은 최대 3개까지 선택할 수 있습니다. 예산 안에서 건물에 가장 필요한 기술을 골라 보세요.")
+        st.caption(f"선택한 기술: {len(st.session_state.technologies)} / 3")
         for name,data in TECHNOLOGIES.items():
             with st.container(border=True):
                 col1,col2=st.columns([3,1])
@@ -462,7 +463,7 @@ elif st.session_state.page == "미래 기술":
                         if st.button("선택 해제",key=f"tech_off_{name}"):
                             st.session_state.technologies.remove(name); st.rerun()
                     else:
-                        if st.button("기술 추가",key=f"tech_on_{name}",disabled=remaining_budget()<data["cost"]):
+                        if st.button("기술 추가",key=f"tech_on_{name}",disabled=(remaining_budget()<data["cost"] or len(st.session_state.technologies)>=3)):
                             st.session_state.technologies.append(name); st.rerun()
         st.caption(f"현재 남은 예산: {remaining_budget()}억 원")
 
@@ -514,8 +515,8 @@ elif st.session_state.page == "완성 및 결과":
             if "태양광 발전" in st.session_state.technologies:
                 st.write("- 건물에서 전력을 생산해 외부 전력망에 대한 의존을 줄일 수 있습니다.")
         elif st.session_state.completed:
-            st.error("아직 성공 조건을 충족하지 못했습니다. 예산을 초과하지 않았는지, 오염지수가 90 이하인지 확인하고 자재·기술을 조정해 보세요.")
-            st.write("성공 조건: 예산 100억 원 이내 · 오염지수 90 이하 · 의뢰 용도와 형태 유지")
+            st.error("아직 성공 조건을 충족하지 못했습니다. 예산을 확인하고, 친환경 자재와 효과가 큰 미래 기술 최대 3개를 조합해 보세요.")
+            st.write("성공 조건: 예산 100억 원 이내 · 오염지수 85 이하 · 미래 기술 최대 3개 · 의뢰 용도와 형태 유지")
 
 st.caption("※ 오염지수와 비용은 게임을 위한 가상 수치입니다. 실제 건축물의 환경 성능을 정밀하게 예측하는 계산값은 아닙니다.")
 
