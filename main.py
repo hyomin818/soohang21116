@@ -85,9 +85,8 @@ def pollution_label(impact):
     return "⚪ 오염지수 변화 없음"
 
 def success_check():
-    # 의뢰 용도·형태는 랜덤 지정 후 잠겨 있으므로 조건 일치 여부를 유지합니다.
-    # 오염지수 90 이하 + 예산 이내면 성공. 강한 기술 없이도 다양한 조합을 허용합니다.
-    return st.session_state.commissioned and pollution_score() <= 90 and remaining_budget() >= 0
+    # 난이도를 아주 조금 높여 오염지수 85 이하 + 예산 이내일 때 성공합니다.
+    return st.session_state.commissioned and pollution_score() <= 85 and remaining_budget() >= 0
 
 def impact_sum():
     return (USAGES[st.session_state.usage]["impact"] + SHAPES[st.session_state.shape]["impact"] +
@@ -95,65 +94,254 @@ def impact_sum():
             sum(TECHNOLOGIES[t]["impact"] for t in st.session_state.technologies))
 
 # --------------------------- 3D 미리보기 ---------------------------
+
+
 def building_figure():
+    """큰 불투명 건물과 황폐하지만 지구다운 지형을 가진 회전형 3D 장면."""
+    import math
     color = COLORS[st.session_state.color]
-    fig = go.Figure()
-    # 황량한 지면과 먼 언덕
-    fig.add_trace(go.Surface(x=[[-18, 18], [-18, 18]], y=[[-14, -14], [14, 14]], z=[[0, 0], [0, 0]],
-        colorscale=[[0, "#b99a70"], [1, "#d7bd91"]], showscale=False, opacity=1, hoverinfo="skip"))
-    for i in range(7):
-        x = [-18 + i * 5, -15 + i * 5, -12 + i * 5]
-        fig.add_trace(go.Scatter3d(x=x, y=[12, 13, 12], z=[1.2 + (i % 3), 2 + (i % 2), 1.2 + (i % 3)],
-            mode="lines", line=dict(color="#9d805d", width=5), showlegend=False, hoverinfo="skip"))
-    # building footprint and height depend on commissioned form
     shape = st.session_state.shape if st.session_state.commissioned else "▰ 직육면체형"
-    height = 8 if shape == "▥ 타워형" else 5
-    half = 3.4 if shape == "◠ 돔형" else 3.0
-    # Four building walls as meshes; centered at origin
-    verts = [(-half,-half,0),(half,-half,0),(half,half,0),(-half,half,0),(-half,-half,height),(half,-half,height),(half,half,height),(-half,half,height)]
-    faces = [(0,1,5),(0,5,4),(1,2,6),(1,6,5),(2,3,7),(2,7,6),(3,0,4),(3,4,7),(4,5,6),(4,6,7)]
-    ii,jj,kk=zip(*faces)
-    fig.add_trace(go.Mesh3d(x=[v[0] for v in verts],y=[v[1] for v in verts],z=[v[2] for v in verts],i=ii,j=jj,k=kk,
-        color=color, opacity=0.98, flatshading=True, name="건축물", showlegend=False, hoverinfo="skip"))
-    # roof variants
-    if shape == "◠ 돔형":
-        # hemisphere represented by a smooth half-sphere mesh
-        import math
-        xs,ys,zs=[],[],[]
+    techs = st.session_state.technologies or []
+    is_tower = shape == "▥ 타워형"
+    is_dome = shape == "◠ 돔형"
+    height = 16.0 if is_tower else 12.5
+    half = 4.8 if is_dome else 4.25
+    fig = go.Figure()
+
+    # 황폐한 지구의 자연 지형: 평평한 바닥 대신 완만한 구릉과 건조한 대지
+    xs = [(-15 + i * .75) for i in range(41)]
+    ys = [(-15 + j * .75) for j in range(41)]
+    X, Y, Z = [], [], []
+    for y in ys:
+        row = []
+        for x in xs:
+            hill_a = 1.15 * math.exp(-(((x-10)/5.5)**2 + ((y-9)/5.0)**2))
+            hill_b = .72 * math.exp(-(((x+11)/4.5)**2 + ((y-7)/6.0)**2))
+            ridge = .32 * math.sin(x*.42) * math.cos(y*.31)
+            crater = -.38 * math.exp(-(((x-8)/2.8)**2 + ((y+8)/3.0)**2))
+            row.append(max(-.35, .05 + hill_a + hill_b + ridge + crater))
+        X.append(xs)
+        Y.append(y)
+        Z.append(row)
+    fig.add_trace(go.Surface(
+        x=X, y=Y, z=Z,
+        surfacecolor=[[((x+15)/30)*.35 + ((y+15)/30)*.18 for x in xs] for y in ys],
+        colorscale=[[0,"#66513e"],[.25,"#8a6d4d"],[.5,"#a58a62"],[.75,"#6f7955"],[1,"#9c8a69"]],
+        cmin=0,cmax=1,showscale=False,opacity=1,
+        lighting=dict(ambient=.72,diffuse=.72,specular=.08,roughness=.95),
+        hoverinfo="skip",name="황폐한 지표"
+    ))
+
+    # 먼 산맥과 침식된 바위 능선
+    for i in range(7):
+        x0 = -15 + i*4.8
+        ridge_x = [x0, x0+1.4, x0+3.0, x0+4.5]
+        ridge_y = [13.2, 12.6, 13.4, 13.0]
+        ridge_z = [.5, 2.4+(i%3)*.55, 1.5+(i%2)*.4, .45]
+        fig.add_trace(go.Scatter3d(
+            x=ridge_x,y=ridge_y,z=ridge_z,mode="lines",
+            line=dict(color="#78644f",width=13),opacity=.85,
+            showlegend=False,hoverinfo="skip"
+        ))
+
+    # 침식된 지면의 갈라진 자국과 마른 물길
+    for k in range(5):
+        cx = -12 + k*5.2
+        fig.add_trace(go.Scatter3d(
+            x=[cx,cx+1.1,cx+2.2,cx+3.4],
+            y=[-12.5,-10.9,-11.8,-9.9],
+            z=[.18,.22,.2,.24],mode="lines",
+            line=dict(color="#c2a47a",width=4),opacity=.65,
+            showlegend=False,hoverinfo="skip"
+        ))
+
+    # 멀리 보이는 낮은 폐허 건축물
+    for rx, ry, rw, rh in [(-12,5,1.4,3.2),(12,7,1.7,4.1),(-10,-8,1.1,2.4),(11,-7,1.3,2.8)]:
+        fig.add_trace(go.Mesh3d(
+            x=[rx-rw,rx+rw,rx+rw,rx-rw,rx-rw,rx+rw,rx+rw,rx-rw],
+            y=[ry-rw,ry-rw,ry+rw,ry+rw,ry-rw,ry-rw,ry+rw,ry+rw],
+            z=[0,0,0,0,rh,rh*.92,rh,rh],
+            i=[0,0,1,1,2,2,3,3],j=[1,2,2,6,3,7,0,4],k=[5,6,5,5,6,6,4,7],
+            color="#756d60",opacity=1,flatshading=True,
+            showlegend=False,hoverinfo="skip"
+        ))
+
+    # 건물 외벽: 완전 불투명한 면으로 구성
+    verts = [(-half,-half,0),(half,-half,0),(half,half,0),(-half,half,0),
+             (-half,-half,height),(half,-half,height),(half,half,height),(-half,half,height)]
+    faces = [(0,1,5),(0,5,4),(1,2,6),(1,6,5),(2,3,7),(2,7,6),
+             (3,0,4),(3,4,7),(4,5,6),(4,6,7)]
+    ii,jj,kk = zip(*faces)
+    fig.add_trace(go.Mesh3d(
+        x=[p[0] for p in verts],y=[p[1] for p in verts],z=[p[2] for p in verts],
+        i=ii,j=jj,k=kk,color=color,opacity=1,flatshading=False,
+        lighting=dict(ambient=.68,diffuse=.78,specular=.18,roughness=.82,fresnel=.02),
+        lightposition=dict(x=70,y=-100,z=180),
+        showlegend=False,hoverinfo="skip",name="불투명한 건물 외벽"
+    ))
+
+    # 네 방향 모두 같은 층수·창문 리듬을 유지하도록 사면에 창문을 배치.
+    # 창문은 내부가 보이지 않는 짙은 청회색 반사 패널.
+    floors = 6 if is_tower else 5
+    for n in range(1,floors):
+        z = height*n/floors
+        # 사면을 감싸는 두꺼운 층간 띠
+        fig.add_trace(go.Scatter3d(
+            x=[-half,half,half,-half,-half],
+            y=[-half,-half,half,half,-half],z=[z]*5,
+            mode="lines",line=dict(color="#d4c8b2",width=6),
+            showlegend=False,hoverinfo="skip"
+        ))
+    window_color = "#263d4a"
+    window_rows = [height*(n+.52)/floors for n in range(floors)]
+    positions = [-2.8,-.95,.95,2.8]
+    for z in window_rows:
+        for p in positions:
+            # 앞/뒤 면: 어두운 불투명 창 + 밝은 프레임
+            for side in [-1,1]:
+                y = side*(half+.025)
+                fig.add_trace(go.Mesh3d(
+                    x=[p-.57,p+.57,p+.57,p-.57],y=[y]*4,
+                    z=[z-.62,z-.62,z+.62,z+.62],
+                    i=[0,0],j=[1,2],k=[2,3],color=window_color,
+                    opacity=1,flatshading=True,showlegend=False,hoverinfo="skip"
+                ))
+                fig.add_trace(go.Scatter3d(
+                    x=[p-.62,p+.62,p+.62,p-.62,p-.62],
+                    y=[y*1.002]*5,z=[z-.67,z-.67,z+.67,z+.67,z-.67],
+                    mode="lines",line=dict(color="#b6b8ad",width=3),
+                    showlegend=False,hoverinfo="skip"
+                ))
+            # 좌/우 면
+            for side in [-1,1]:
+                x = side*(half+.025)
+                fig.add_trace(go.Mesh3d(
+                    x=[x]*4,y=[p-.57,p+.57,p+.57,p-.57],
+                    z=[z-.62,z-.62,z+.62,z+.62],
+                    i=[0,0],j=[1,2],k=[2,3],color=window_color,
+                    opacity=1,flatshading=True,showlegend=False,hoverinfo="skip"
+                ))
+                fig.add_trace(go.Scatter3d(
+                    x=[x*1.002]*5,y=[p-.62,p+.62,p+.62,p-.62,p-.62],
+                    z=[z-.67,z-.67,z+.67,z+.67,z-.67],
+                    mode="lines",line=dict(color="#b6b8ad",width=3),
+                    showlegend=False,hoverinfo="skip"
+                ))
+
+    # 테라스형: 층마다 실제 바닥판이 돌출되며 불투명한 난간 설치
+    if shape == "▤ 테라스형":
+        for level in range(1,5):
+            z = height*level/5
+            ext = half + (1.15 if level%2 else .72)
+            fig.add_trace(go.Mesh3d(
+                x=[-ext,ext,ext,-ext],y=[-ext,-ext,ext,ext],z=[z]*4,
+                i=[0,0],j=[1,2],k=[2,3],color="#8c9b78",opacity=1,
+                showlegend=False,hoverinfo="skip"
+            ))
+            fig.add_trace(go.Scatter3d(
+                x=[-ext,ext,ext,-ext,-ext],y=[-ext,-ext,ext,ext,-ext],
+                z=[z+.72]*5,mode="lines",
+                line=dict(color="#d8d4c8",width=6),
+                showlegend=False,hoverinfo="skip"
+            ))
+
+    # 돔형 지붕은 반투명 유리 대신 불투명한 금속 패널로 구성
+    if is_dome:
+        dome_x,dome_y,dome_z=[],[],[]
         for a in range(17):
             theta=math.pi*a/32
             for b in range(33):
                 phi=2*math.pi*b/32
-                xs.append(half*math.sin(theta)*math.cos(phi)); ys.append(half*math.sin(theta)*math.sin(phi)); zs.append(height+half*math.cos(theta))
-        I=[];J=[];K=[]
+                dome_x.append(half*math.sin(theta)*math.cos(phi))
+                dome_y.append(half*math.sin(theta)*math.sin(phi))
+                dome_z.append(height+half*.72*math.cos(theta))
+        di,dj,dk=[],[],[]
         for a in range(16):
             for b in range(32):
-                q=a*33+b; I.extend([q,q+1]);J.extend([q+33,q+33]);K.extend([q+34,q+34])
-        fig.add_trace(go.Mesh3d(x=xs,y=ys,z=zs,i=I,j=J,k=K,color=color,opacity=0.95,showscale=False,showlegend=False,hoverinfo="skip"))
-    elif shape == "▤ 테라스형":
-        for level in range(1,4):
-            z=height*level/4
-            ext=half + (0.6 if level%2 else 0.2)
-            fig.add_trace(go.Mesh3d(x=[-ext,ext,ext,-ext],y=[-ext,-ext,ext,ext],z=[z,z,z,z],i=[0,0],j=[1,2],k=[2,3],color="#a6b8a4",opacity=.9,showlegend=False,hoverinfo="skip"))
-    # windows on all four faces
-    for z in ([1.5,3.5,5.5] if height >= 8 else [1.5,3.2]):
-        if z >= height: continue
-        for pos in [-1.8,0,1.8]:
-            # front and rear
-            for y in [-half-0.025, half+0.025]:
-                fig.add_trace(go.Mesh3d(x=[pos-.42,pos+.42,pos+.42,pos-.42],y=[y,y,y,y],z=[z-.35,z-.35,z+.35,z+.35],i=[0,0],j=[1,2],k=[2,3],color="#bce8ee",opacity=.98,showlegend=False,hoverinfo="skip"))
-            # left and right
-            for x in [-half-.025, half+.025]:
-                fig.add_trace(go.Mesh3d(x=[x,x,x,x],y=[pos-.42,pos+.42,pos+.42,pos-.42],z=[z-.35,z-.35,z+.35,z+.35],i=[0,0],j=[1,2],k=[2,3],color="#bce8ee",opacity=.98,showlegend=False,hoverinfo="skip"))
-    # tech visual cues: green roof patch / solar panels / trees
-    if "태양광 발전" in (st.session_state.technologies or []):
-        for x in [-1.7,0,1.7]:
-            fig.add_trace(go.Mesh3d(x=[x-.65,x+.65,x+.65,x-.65],y=[-1.4,-1.4,-.4,-.4],z=[height+.08]*4,i=[0,0],j=[1,2],k=[2,3],color="#244d70",opacity=1,showlegend=False,hoverinfo="skip"))
-    if "녹화 지붕·벽면" in (st.session_state.technologies or []):
-        fig.add_trace(go.Mesh3d(x=[-2.7,2.7,2.7,-2.7],y=[-2.7,-2.7,2.7,2.7],z=[height+.12]*4,i=[0,0],j=[1,2],k=[2,3],color="#5d8b58",opacity=1,showlegend=False,hoverinfo="skip"))
-    fig.update_layout(height=530, margin=dict(l=0,r=0,t=0,b=0), paper_bgcolor="#101a20", plot_bgcolor="#101a20",
-        scene=dict(xaxis=dict(visible=False,range=[-18,18]),yaxis=dict(visible=False,range=[-14,14]),zaxis=dict(visible=False,range=[0,14]),
-        bgcolor="#101a20", aspectmode="manual", aspectratio=dict(x=1.2,y=1,z=.55), camera=dict(eye=dict(x=1.6,y=1.6,z=1.0))))
+                q=a*33+b
+                di.extend([q,q+1]);dj.extend([q+33,q+33]);dk.extend([q+34,q+34])
+        fig.add_trace(go.Mesh3d(
+            x=dome_x,y=dome_y,z=dome_z,i=di,j=dj,k=dk,
+            color="#9b9b8e",opacity=1,flatshading=False,
+            lighting=dict(ambient=.7,diffuse=.7,specular=.12,roughness=.85),
+            showlegend=False,hoverinfo="skip"
+        ))
+
+    # 두꺼운 옥상 파라펫과 설비 구조물
+    roof_z=height+.18
+    fig.add_trace(go.Mesh3d(
+        x=[-half-.25,half+.25,half+.25,-half-.25],
+        y=[-half-.25,-half-.25,half+.25,half+.25],
+        z=[roof_z]*4,i=[0,0],j=[1,2],k=[2,3],
+        color="#c6bca8",opacity=1,showlegend=False,hoverinfo="skip"
+    ))
+    for x in [-2.5,0,2.5]:
+        fig.add_trace(go.Mesh3d(
+            x=[x-.42,x+.42,x+.42,x-.42],
+            y=[-1.5,-1.5,1.5,1.5],
+            z=[roof_z+.25]*4,i=[0,0],j=[1,2],k=[2,3],
+            color="#344b60",opacity=1,showlegend=False,hoverinfo="skip"
+        ))
+
+    # 옥상 녹화와 태양광 설비
+    if "녹화 지붕·벽면" in techs:
+        for x in [-2.6,-1.3,0,1.3,2.6]:
+            fig.add_trace(go.Scatter3d(
+                x=[x,x+.22],y=[.2,.4],z=[roof_z+.3,roof_z+1.0],
+                mode="lines",line=dict(color="#6e9862",width=8),
+                showlegend=False,hoverinfo="skip"
+            ))
+    if "태양광 발전" in techs:
+        for x in [-2.7,-1.0,.7,2.4]:
+            fig.add_trace(go.Mesh3d(
+                x=[x-.48,x+.48,x+.48,x-.48],
+                y=[-1.6,-1.6,-.45,-.45],z=[roof_z+.32]*4,
+                i=[0,0],j=[1,2],k=[2,3],color="#24445e",
+                opacity=1,showlegend=False,hoverinfo="skip"
+            ))
+
+    # 정면의 묵직한 출입구와 넓은 캐노피
+    front=-half-.08
+    fig.add_trace(go.Mesh3d(
+        x=[-1.05,1.05,1.05,-1.05],y=[front]*4,z=[0,0,3.0,3.0],
+        i=[0,0],j=[1,2],k=[2,3],color="#253744",opacity=1,
+        showlegend=False,hoverinfo="skip"
+    ))
+    fig.add_trace(go.Mesh3d(
+        x=[-1.8,1.8,1.8,-1.8],
+        y=[-half-1.05,-half-1.05,-half-.02,-half-.02],
+        z=[3.15]*4,i=[0,0],j=[1,2],k=[2,3],
+        color="#c2aa83",opacity=1,showlegend=False,hoverinfo="skip"
+    ))
+
+    # 황폐한 지구에도 남아 있는 드문 나무·관목
+    for tx,ty,scale in [(-7,-3,.9),(7,-2,1.0),(-8,7,.75),(8,6,.8),(-3,-9,.55)]:
+        fig.add_trace(go.Scatter3d(
+            x=[tx,tx],y=[ty,ty],z=[.15,1.7*scale],
+            mode="lines",line=dict(color="#66513b",width=8),
+            showlegend=False,hoverinfo="skip"
+        ))
+        fig.add_trace(go.Scatter3d(
+            x=[tx],y=[ty],z=[2.35*scale],
+            mode="markers",marker=dict(size=17*scale,color="#71835a",opacity=1),
+            showlegend=False,hoverinfo="skip"
+        ))
+
+    # 화면 내 건물 크기를 키우고, 어떤 방향에서도 왜곡되지 않도록 고정 비율 사용.
+    fig.update_layout(
+        height=720,margin=dict(l=0,r=0,t=0,b=0),
+        paper_bgcolor="#17232a",plot_bgcolor="#17232a",
+        scene=dict(
+            xaxis=dict(visible=False,range=[-13,13]),
+            yaxis=dict(visible=False,range=[-13,14]),
+            zaxis=dict(visible=False,range=[0,19]),
+            bgcolor="#17232a",
+            aspectmode="manual",aspectratio=dict(x=1.0,y=1.0,z=1.0),
+            camera=dict(eye=dict(x=1.55,y=1.55,z=1.05),projection=dict(type="orthographic")),
+            dragmode="orbit"
+        ),
+        showlegend=False
+    )
     return fig
 
 # --------------------------- 스타일 ---------------------------
@@ -205,13 +393,13 @@ if st.session_state.page == "메인 화면":
         st.write(f"**색상:** {st.session_state.color}")
         st.caption("오른쪽 3D 건물은 마우스로 드래그해 여러 방향에서 확인할 수 있습니다.")
     with right:
-        st.plotly_chart(building_figure(),use_container_width=True,config={"displaylogo":False,"scrollZoom":True})
+        st.plotly_chart(building_figure(),use_container_width=True,config={"displayModeBar":False,"scrollZoom":False,"doubleClick":False,"responsive":True})
     if st.session_state.commissioned:
         a,b,c=st.columns(3)
         a.metric("남은 예산",f"{remaining_budget()}억")
         b.metric("오염지수",f"{pollution_score()}/100",delta=f"{pollution_score()-100:+d} 지수",delta_color="inverse")
-        c.metric("성공 목표","90 이하")
-        st.info("게임 성공 조건: 의뢰받은 건물을 그대로 유지하고, 예산을 초과하지 않으며, 오염지수 90 이하를 달성하세요. 선택 조합에 따라 성공할 수 있습니다.")
+        c.metric("성공 목표","85 이하")
+        st.info("게임 성공 조건: 의뢰받은 건물을 그대로 유지하고, 예산을 초과하지 않으며, 오염지수 85 이하를 달성하세요. 선택 조합에 따라 성공할 수 있습니다.")
 
 elif st.session_state.page == "건물 용도":
     st.title("🏢 건물 용도")
@@ -234,7 +422,7 @@ elif st.session_state.page == "건축 형태":
         st.write(data["desc"])
         st.info(f"의뢰 형태 비용: {data['cost']}억 원 · {pollution_label(data['impact'])}")
         st.caption("의뢰인이 지정한 형태이므로 변경할 수 없습니다. 이 비용은 의뢰 수락 시 예산에서 이미 차감되었습니다.")
-        st.plotly_chart(building_figure(),use_container_width=True,config={"displaylogo":False})
+        st.plotly_chart(building_figure(),use_container_width=True,config={"displayModeBar":False,"scrollZoom":False,"doubleClick":False,"responsive":True})
 
 elif st.session_state.page == "미래 자재":
     st.title("🧱 미래 자재 선택")
@@ -285,14 +473,14 @@ elif st.session_state.page == "꾸미기":
     else:
         st.write("꾸미기에서는 건물 색상만 바꿀 수 있습니다. 예산과 오염지수에는 영향을 주지 않습니다.")
         st.session_state.color=st.selectbox("건물 외장 색상",list(COLORS.keys()),index=list(COLORS.keys()).index(st.session_state.color))
-        st.plotly_chart(building_figure(),use_container_width=True,config={"displaylogo":False})
+        st.plotly_chart(building_figure(),use_container_width=True,config={"displayModeBar":False,"scrollZoom":False,"doubleClick":False,"responsive":True})
 
 elif st.session_state.page == "완성 및 결과":
     st.title("🏁 건축 프로젝트 완성")
     if not st.session_state.commissioned:
         st.warning("먼저 메인 화면에서 건축 의뢰를 받아 주세요.")
     else:
-        st.plotly_chart(building_figure(),use_container_width=True,config={"displaylogo":False})
+        st.plotly_chart(building_figure(),use_container_width=True,config={"displayModeBar":False,"scrollZoom":False,"doubleClick":False,"responsive":True})
         st.subheader("최종 설계 요약")
         x,y,z=st.columns(3)
         x.metric("총 설계 비용",f"{design_cost()}억 원")
