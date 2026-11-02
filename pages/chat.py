@@ -344,10 +344,8 @@ if not mission_ready:
         st.metric("남은 예산", "{}억원".format(remaining), delta="예산 초과" if remaining < 0 else "예산 범위 내")
     st.info("메인 페이지로 돌아가 미래 기술과 자재를 다시 조합한 뒤, 설계 성공 조건을 달성해 주세요.")
     if st.button("🏗️ 메인 설계로 돌아가기", use_container_width=True):
-        # 현재 게임과 주민 대화의 세션 값을 전부 비운 뒤 메인 페이지로 이동합니다.
-        # main.py의 init_state()가 기본값(의뢰 전, 예산 100억 등)을 다시 생성합니다.
-        for key in list(st.session_state.keys()):
-            del st.session_state[key]
+        # 메인 페이지가 진입할 때 세션 상태를 안전하게 초기화하도록 요청 플래그를 전달합니다.
+        st.session_state["reset_game_requested"] = True
         st.switch_page("main.py")
     st.stop()
 
