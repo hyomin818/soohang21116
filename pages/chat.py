@@ -12,53 +12,54 @@ USAGE_PEOPLE = {
     "🔬 미래 연구센터": ["20대 연구원", "건물 관리인"],
 }
 SHAPE_TEXT = {
-    "🏙️ 수직형 타워": "높은 층에 살면 전망은 좋지만 엘리베이터를 기다리는 시간이 길게 느껴질 때가 있어요.",
-    "🌿 테라스형": "테라스가 있으면 바깥 공기를 쐬거나 식물을 돌보며 잠깐 쉴 수 있어요. 비 오거나 바람이 강한 날은 아쉬워요.",
-    "🛸 돔형": "천장이 높고 공간이 탁 트인 느낌이에요. 다만 햇빛이 강한 날에는 눈부심이 생기는지 신경 쓰여요.",
-    "🌍 저층 생태형": "바깥 공간과 가까워서 편안해요. 목적지에 따라 걸어 다니는 거리가 길어질 때는 있어요.",
-    "🌍 반지하형": "바깥 날씨 영향을 덜 받는 느낌이지만, 햇빛이 잘 들어오는지와 습도 관리가 중요해요.",
+    "▥ 타워형": "높은 층에 살면 전망은 좋지만 엘리베이터를 기다리는 시간이 길게 느껴질 때가 있어요.",
+    "▤ 테라스형": "테라스가 있으면 바깥 공기를 쐬거나 식물을 돌보며 잠깐 쉴 수 있어요. 비 오거나 바람이 강한 날은 아쉬워요.",
+    "◠ 돔형": "천장이 높고 공간이 탁 트인 느낌이에요. 다만 햇빛이 강한 날에는 눈부심이 생기는지 신경 쓰여요.",
+    "▰ 직육면체형": "바깥 공간과 가까워서 편안해요. 목적지에 따라 걸어 다니는 거리가 길어질 때는 있어요.",
+    "▰ 직육면체형": "바깥 날씨 영향을 덜 받는 느낌이지만, 햇빛이 잘 들어오는지와 습도 관리가 중요해요.",
 }
 MATERIAL_TEXT = {
-    "🧱 저탄소 콘크리트": "실내는 차분하고 묵직한 느낌이에요. 저는 재료의 생산 방식보다는 실제로 지낼 때의 분위기가 먼저 느껴져요.",
-    "🔩 저탄소 철강": "프레임이 보이는 곳은 도시적이고 단단한 인상을 줘요. 공간에 따라 조금 차갑게 느껴질 수도 있어요.",
-    "🌲 목재·바이오 기반": "나무 느낌이 있는 공간은 따뜻하고 편안하게 느껴져요. 표면이나 관리 상태에 따라서 느낌이 달라질 것 같아요.",
-    "♻️ 재사용·재활용 재료": "재료마다 색이나 표면이 조금씩 달라서 공간에 개성이 생길 수 있어요.",
+    "저탄소 콘크리트": "실내는 차분하고 묵직한 느낌이에요. 저는 재료의 생산 방식보다는 실제로 지낼 때의 분위기가 먼저 느껴져요.",
+    "저탄소 철강": "프레임이 보이는 곳은 도시적이고 단단한 인상을 줘요. 공간에 따라 조금 차갑게 느껴질 수도 있어요.",
+    "목재·바이오 기반 자재": "나무 느낌이 있는 공간은 따뜻하고 편안하게 느껴져요. 표면이나 관리 상태에 따라서 느낌이 달라질 것 같아요.",
+    "재사용·재활용 자재": "재료마다 색이나 표면이 조금씩 달라서 공간에 개성이 생길 수 있어요.",
 }
 TECH_TEXT = {
-    "☀️ 태양광 발전": "공용 공간에서 쓰는 전기를 건물에서 만든다는 점이 마음에 들어요. 실제로 얼마나 절약되는지도 알 수 있으면 좋겠어요.",
-    "🌬️ 자연환기": "날씨가 좋을 때는 공기가 답답하지 않아서 좋아요. 바깥 공기가 나쁜 날에는 다른 환기 방법도 필요하겠죠.",
-    "🪟 외부 차양": "햇빛이 강한 시간에 눈부심이 줄어들면 실내에서 지내기가 훨씬 편해요.",
-    "🌱 녹화 지붕": "초록이 보이면 건물이 덜 삭막하게 느껴져요. 옥상 주변의 더위를 줄이는 데도 도움이 될 수 있어요.",
-    "💧 빗물 이용": "빗물을 조경에 활용한다면 물을 아낀다는 점에서 괜찮은 것 같아요.",
-    "🔄 물 재이용": "물을 아껴 쓰는 건 좋은데, 어떤 용도로 다시 쓰는지 안내가 잘 되어 있으면 더 안심될 것 같아요.",
+    "태양광 발전": "공용 공간에서 쓰는 전기를 건물에서 만든다는 점이 마음에 들어요. 실제로 얼마나 절약되는지도 알 수 있으면 좋겠어요.",
+    "자연환기 설계": "날씨가 좋을 때는 공기가 답답하지 않아서 좋아요. 바깥 공기가 나쁜 날에는 다른 환기 방법도 필요하겠죠.",
+    "외부 차양": "햇빛이 강한 시간에 눈부심이 줄어들면 실내에서 지내기가 훨씬 편해요.",
+    "녹화 지붕·벽면": "초록이 보이면 건물이 덜 삭막하게 느껴져요. 옥상 주변의 더위를 줄이는 데도 도움이 될 수 있어요.",
+    "빗물 저장·이용": "빗물을 조경에 활용한다면 물을 아낀다는 점에서 괜찮은 것 같아요.",
+    "물 재이용 설비": "물을 아껴 쓰는 건 좋은데, 어떤 용도로 다시 쓰는지 안내가 잘 되어 있으면 더 안심될 것 같아요.",
 }
 USAGE_DATA = {
-    "🏠 미래 주거시설": {"cost": 10, "impact": 4},
-    "🏫 미래 학교": {"cost": 8, "impact": 2},
-    "🏥 미래 병원": {"cost": 16, "impact": 6},
-    "🔬 미래 연구센터": {"cost": 12, "impact": 3},
+    "🏠 미래 주거시설": {"cost": 8, "impact": 3},
+    "🏫 미래 학교": {"cost": 10, "impact": 4},
+    "🏥 미래 병원": {"cost": 13, "impact": 5},
+    "🔬 미래 연구센터": {"cost": 12, "impact": 4},
+    "🌿 친환경 복합시설": {"cost": 11, "impact": 2},
 }
 SHAPE_DATA = {
-    "🏙️ 수직형 타워": {"cost": 18, "impact": 7},
-    "🌿 테라스형": {"cost": 15, "impact": 3},
-    "🌿 테라스형 건축": {"cost": 15, "impact": 3},
-    "🛸 돔형": {"cost": 22, "impact": 2},
-    "🛸 돔형 건축": {"cost": 22, "impact": 2},
-    "🌍 저층 생태형": {"cost": 12, "impact": 1},
+    "▰ 직육면체형": {"cost": 7, "impact": 3},
+    "◠ 돔형": {"cost": 12, "impact": 1},
+    "▤ 테라스형": {"cost": 11, "impact": 0},
+    "▥ 타워형": {"cost": 10, "impact": 4},
 }
 MATERIAL_DATA = {
-    "🧱 저탄소 콘크리트": {"cost": 12, "impact": 6},
-    "🔩 저탄소 철강": {"cost": 18, "impact": 5},
-    "🌲 목재·바이오 기반": {"cost": 24, "impact": 2},
-    "♻️ 재사용·재활용 재료": {"cost": 20, "impact": 0},
+    "일반 콘크리트": {"cost": 5, "impact": 2},
+    "저탄소 콘크리트": {"cost": 9, "impact": -10},
+    "저탄소 철강": {"cost": 12, "impact": -14},
+    "목재·바이오 기반 자재": {"cost": 15, "impact": -20},
+    "재사용·재활용 자재": {"cost": 17, "impact": -24},
 }
 TECH_DATA = {
-    "☀️ 태양광 발전": {"cost": 30, "impact": -10},
-    "🌬️ 자연환기": {"cost": 15, "impact": -7},
-    "🪟 외부 차양": {"cost": 10, "impact": -6},
-    "🌱 녹화 지붕": {"cost": 18, "impact": -7},
-    "💧 빗물 이용": {"cost": 7, "impact": -5},
-    "🔄 물 재이용": {"cost": 15, "impact": -5},
+    "태양광 발전": {"cost": 17, "impact": -24},
+    "고효율 단열": {"cost": 12, "impact": -18},
+    "자연환기 설계": {"cost": 8, "impact": -13},
+    "외부 차양": {"cost": 7, "impact": -10},
+    "녹화 지붕·벽면": {"cost": 13, "impact": -17},
+    "빗물 저장·이용": {"cost": 6, "impact": -7},
+    "물 재이용 설비": {"cost": 9, "impact": -10},
 }
 COLORS = {
     "#5D7F7A": "미래형 민트", "#A77D5C": "사막 모래", "#C9D4D0": "화이트",
@@ -113,36 +114,38 @@ material = st.session_state.get("material", "🧱 저탄소 콘크리트")
 techs = st.session_state.get("technologies", [])
 if not isinstance(techs, list):
     techs = list(techs) if techs else []
-color = st.session_state.get("building_color", "#5D7F7A")
+color = st.session_state.get("color", "사막 모래색")
 people = USAGE_PEOPLE.get(usage, USAGE_PEOPLE["🏠 미래 주거시설"])
 
 def lookup(data, value, default):
     return data.get(value, default)
 
-budget = st.session_state.get("budget", 100)
+budget = st.session_state.get("base_budget", 100)
 design_cost = (
     lookup(USAGE_DATA, usage, {"cost": 10, "impact": 4})["cost"]
     + lookup(SHAPE_DATA, shape, {"cost": 18, "impact": 7})["cost"]
     + lookup(MATERIAL_DATA, material, {"cost": 12, "impact": 6})["cost"]
     + sum(lookup(TECH_DATA, item, {"cost": 0, "impact": 0})["cost"] for item in techs)
 )
+total_cost = design_cost
+tech_cost = sum(lookup(TECH_DATA, item, {"cost": 0, "impact": 0})["cost"] for item in techs)
 remaining = budget - design_cost
-reduction = (
-    abs(lookup(USAGE_DATA, usage, {"cost": 10, "impact": 4})["impact"])
-    + abs(lookup(SHAPE_DATA, shape, {"cost": 18, "impact": 7})["impact"])
-    + abs(lookup(MATERIAL_DATA, material, {"cost": 12, "impact": 6})["impact"])
-    + 2 * sum(abs(lookup(TECH_DATA, item, {"cost": 0, "impact": 0})["impact"]) for item in techs)
+impact_total = (
+    lookup(USAGE_DATA, usage, {"cost": 8, "impact": 3})["impact"]
+    + lookup(SHAPE_DATA, shape, {"cost": 7, "impact": 3})["impact"]
+    + lookup(MATERIAL_DATA, material, {"cost": 5, "impact": 2})["impact"]
+    + sum(lookup(TECH_DATA, item, {"cost": 0, "impact": 0})["impact"] for item in techs)
 )
-pollution = max(0, 100 - reduction)
-# This mirrors main.py: the building is ready only at pollution <= 40 and within budget.
+pollution = max(0, min(100, 100 + impact_total))
+# Main game condition: pollution <= 40 and budget must not be exceeded.
 mission_ready = pollution <= 40 and remaining >= 0
 
 # Reset old messages if the building design has changed.
 signature = (usage, shape, material, tuple(techs), color, total_cost, pollution)
 if st.session_state.get("resident_chat_signature") != signature:
     st.session_state["resident_chat_signature"] = signature
-    st.session_state["resident_chat_history"] = []
-    st.session_state["resident_chat_character"] = None
+    st.session_state["resident_history"] = []
+    st.session_state["resident_person_current"] = None
 
 def first_message(person):
     air_low = pollution <= 35
@@ -274,11 +277,11 @@ def reply_to(message, person):
         return "현재 형태는 {}, 자재는 {}입니다. 운영 중에는 점검 공간과 부품 교체 접근성을 확인해야 합니다. 총비용은 {}억원이고 남은 예산은 {}억원입니다.".format(shape, material, total_cost, remaining)
 
     if any(word in q for word in ["불편", "아쉬", "단점", "문제", "고쳐", "개선"]):
-        if "타워" in shape:
+        if "타워형" in shape:
             return "솔직히 높은 층에서 엘리베이터 기다릴 때는 좀 답답해. 출근이나 등교 시간이 겹치면 더 그렇고."
-        if "테라스" in shape:
+        if "테라스형" in shape:
             return "테라스는 진짜 좋은데 비 오고 나면 바닥이 미끄럽거나 바람이 세서 오래 못 있을 때가 있어. 배수랑 그늘도 잘 되어 있으면 좋겠어."
-        if "돔" in shape:
+        if "돔형" in shape:
             return "공간이 멋있긴 한데 햇빛이 강한 날엔 눈부실 것 같아. 벽 쪽이 둥글어서 가구 놓는 게 애매한 자리도 있을 수 있겠더라."
         return "큰 불편은 없어도 사람마다 필요한 게 다르더라. 조용히 쉴 자리나 이동 동선은 더 신경 써주면 좋겠어."
     if any(word in q for word in ["좋은 점", "장점", "만족", "후기", "마음에", "좋아", "어때", "평가"]):
@@ -294,21 +297,21 @@ def reply_to(message, person):
             return "집중할 수 있는 조용한 자리랑 잠깐 머리를 식힐 공간이 있는 게 좋아요. 하루 종일 일하면 그런 차이가 크게 느껴져요."
         return "제일 마음에 드는 건 공간이 주는 느낌이에요. {} 직접 지내보면 외관보다 빛이나 소리, 쉴 곳이 더 크게 느껴질 때도 있어요.".format(SHAPE_TEXT.get(shape, "공간이 편안해요."))
     if any(word in q for word in ["덥", "더위", "시원", "햇빛", "눈부", "온도", "추워"]):
-        if "🪟 외부 차양" in techs:
+        if "외부 차양" in techs:
             return "햇빛이 강한 시간에도 눈이 덜 부셔서 좋아. 계절이나 창문 방향에 따라 다르겠지만 낮에 머물기 한결 편해."
         return "한낮에는 햇빛이 강한 자리가 좀 덥거나 눈부실 수 있어. 그늘이 있거나 햇빛을 조절할 수 있으면 훨씬 편할 것 같아."
     if any(word in q for word in ["공기", "환기", "답답", "냄새", "바람"]):
-        if "🌬️ 자연환기" in techs:
+        if "자연환기 설계" in techs:
             return "날씨 괜찮을 때는 창문 열고 공기를 바꿀 수 있어서 좋아. 다만 바깥 공기가 안 좋은 날에는 다른 환기 방법도 필요해."
         return "사람이 많을 때는 조금 답답하게 느껴질 수 있어. 창문을 열기 어려운 날에도 공기가 잘 돌면 좋겠어."
     if any(word in q for word in ["소음", "시끄", "조용", "소리"]):
         return "사람이 몰리는 시간에는 복도나 공용 공간 소리가 들릴 때가 있어. 조용히 쉴 수 있는 자리가 따로 있으면 좋겠어."
     if any(word in q for word in ["물", "빗물", "수도"]):
-        if any(t in techs for t in ["💧 빗물 이용", "🔄 물 재이용"]):
+        if any(t in techs for t in ["빗물 저장·이용", "물 재이용 설비"]):
             return "물을 아껴 쓰는 설비가 있다는 게 좋아. 어떤 물을 어디에 다시 쓰는지 안내가 잘 되어 있으면 더 안심될 것 같아."
         return "물 쓰는 데 큰 불편은 없지만, 조경이나 청소에 빗물을 활용하면 물을 아낄 수 있을 것 같아."
     if any(word in q for word in ["전기", "전기료", "태양광"]):
-        if "☀️ 태양광 발전" in techs:
+        if "태양광 발전" in techs:
             return "지붕에서 전기를 만든다는 점은 마음에 들어. 공용 전기료가 얼마나 줄었는지도 알 수 있으면 더 실감 날 것 같아."
         return "태양광이 있으면 공용 공간 전기 사용에 도움이 될 것 같아. 실제로 얼마나 절약되는지는 사용량을 봐야겠지."
     if any(word in q for word in ["자재", "재료", "콘크리트", "철강", "목재", "재활용"]):
