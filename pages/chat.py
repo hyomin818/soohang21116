@@ -137,9 +137,7 @@ impact_total = (
     + sum(lookup(TECH_DATA, item, {"cost": 0, "impact": 0})["impact"] for item in techs)
 )
 pollution = max(0, min(100, 100 + impact_total))
-# Main game condition: pollution <= 40 and budget must not be exceeded.
-mission_ready = pollution <= 40 and remaining >= 0
-
+# 주민 대화 접근은 성공 판정과 무관합니다.
 # Reset old messages if the building design has changed.
 signature = (usage, shape, material, tuple(techs), color, total_cost, pollution)
 if st.session_state.get("resident_chat_signature") != signature:
@@ -331,54 +329,12 @@ def reply_to(message, person):
         "사람마다 다르겠지만 편안함이 제일 중요해. 생활하면서 어떤 상황이 궁금한지 더 구체적으로 물어봐!"
     ])
 
-if not mission_ready:
-    st.title("🔒 입주 보류 — 주민 대화 잠금")
-    st.warning(
-        "아직 건물 완성 조건을 만족하지 못해 주민들이 입주하지 않았습니다. "
-        "게임 규칙상 오염지수 40 이하이면서 예산을 초과하지 않아야 대화를 시작할 수 있습니다."
-    )
-    # Streamlit st.metric frontend dynamic-import failure 방지: 단순 텍스트 카드로 표시
-    col1, col2 = st.columns(2)
-    with col1:
-        st.markdown(
-            "<div style='padding:12px 14px;border-radius:10px;background:#102a35'>"
-            "<div style='font-size:14px'>현재 오염지수</div>"
-            "<div style='font-size:30px;font-weight:600'>{}/100</div>"
-            "<div style='font-size:13px;color:#8bd4a6'>목표: 40 이하</div></div>".format(pollution),
-            unsafe_allow_html=True,
-        )
-    with col2:
-        budget_status = "예산 초과" if remaining < 0 else "예산 범위 내"
-        status_color = "#ff8585" if remaining < 0 else "#8bd4a6"
-        st.markdown(
-            "<div style='padding:12px 14px;border-radius:10px;background:#102a35'>"
-            "<div style='font-size:14px'>남은 예산</div>"
-            "<div style='font-size:30px;font-weight:600'>{}억원</div>"
-            "<div style='font-size:13px;color:{}'>{}</div></div>".format(remaining, status_color, budget_status),
-            unsafe_allow_html=True,
-        )
-    st.info("메인 페이지로 돌아가 미래 기술과 자재를 다시 조합한 뒤, 설계 성공 조건을 달성해 주세요.")
-    if st.button("🏗️ 새 게임 시작 — 메인 설계로 돌아가기", use_container_width=True, key="restart_from_resident_lock"):
-        # 실패는 주민 대화만 잠급니다. 메인 설계는 항상 접근 가능하고 이 버튼은 새 게임 상태로 초기화합니다.
-        st.session_state["page"] = "메인 화면"
-        st.session_state["commissioned"] = False
-        st.session_state["completed"] = False
-        st.session_state["usage"] = None
-        st.session_state["shape"] = None
-        st.session_state["material"] = "일반 콘크리트"
-        st.session_state["technologies"] = []
-        st.session_state["color"] = "사막 모래색"
-        st.session_state["base_budget"] = 100
-        st.session_state["show_result"] = False
-        # reset marker가 이전 실행에서 남아 있다면 제거
-        if "reset_game_requested" in st.session_state:
-            del st.session_state["reset_game_requested"]
-        # 새 의뢰는 메인에서 '무작위 건축 의뢰 받기'로 시작
-        st.switch_page("main.py")
-    st.stop()
+# 주민 대화는 게임 성공 여부와 관계없이 언제든 이용할 수 있습니다.
+st.title("💬 주민과 자유롭게 대화하기")
+st.info("게임 성공 여부와 관계없이 주민 대화가 열려 있습니다. 설계가 미완성이어도 대화를 시작할 수 있어요.")
 
-st.title("💬 완성된 건물, 실제로 살아보면?")
-st.write("이제 입주가 시작됐어요. 건물 평가도 듣고, 영화나 음식 같은 딴 얘기도 편하게 나눠 보세요.")
+
+st.write("건물 평가도 듣고, 영화나 음식 같은 딴 얘기도 편하게 나눠 보세요.")
 try:
     has_gemini_key = bool(st.secrets.get("GEMINI_API_KEY") or st.secrets.get("GOOGLE_API_KEY"))
 except Exception:
