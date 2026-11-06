@@ -344,14 +344,14 @@ if not has_gemini_key:
 
 with st.sidebar:
     st.subheader("🏗️ 현재 설계")
-    st.write("**용도:** " + usage)
-    st.write("**형태:** " + shape)
-    st.write("**자재:** " + material)
+    st.write(f"**용도:** {usage}")
+    st.write(f"**형태:** {shape}")
+    st.write(f"**자재:** {material}")
     st.write("**미래 기술:** " + (", ".join(techs) if techs else "선택 없음"))
     st.write("**총비용:** {}억원 / {}억원".format(total_cost, budget))
     st.write("**남은 예산:** {}억원".format(remaining))
     st.write("**게임 오염지수:** {}/100".format(pollution))
-    st.caption("외관 색상: " + COLORS.get(color, color))
+    st.caption(f"외관 색상: {COLORS.get(color, str(color))}")
     st.divider()
     selected_person = st.selectbox("누구와 대화할까요?", people, key="resident_person_picker")
     if st.button("대화 처음부터 다시 하기", use_container_width=True):
